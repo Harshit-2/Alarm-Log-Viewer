@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="AlarmLogViewerAPI/AlertViewerAPI.csproj" />
+  <Project Path="AlarmLogViewerApiGateway/AlarmLogViewerApiGateway.csproj" Id="2be2c564-9995-4a19-b881-e5ec2aa3237b" />
+  <Project Path="AlertsLibrary/AlertsLibrary.csproj" />
+  <Project Path="AuthenticationWebApi/AuthenticationWebApi.csproj" Id="eae46490-8664-444e-9a74-154c7c8b96e3" />
+  <Project Path="RoomsLibrary/RoomsLibrary.csproj" />
+  <Project Path="RoomViewerAPI/RoomViewerAPI.csproj" Id="260cc02a-7be0-43b8-a537-8caa67d35097" />
+  <Project Path="SharedContracts/SharedContracts.csproj" />
+  <Project Path="TemperatureLibrary/TemperatureLibrary.csproj" />
+  <Project Path="TemperatureViewerAPI/TemperatureViewerAPI.csproj" Id="d735cac5-0115-4322-9ac9-12b045741ad9" />
+  <Project Path="UserLibrary/UserLibrary.csproj" />
+  <Project Path="UserViewerAPI/UserViewerAPI.csproj" Id="f9bd0d3a-c4d7-42e7-a652-1ff400f8e1fd" />
+</Solution>

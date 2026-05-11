@@ -1,0 +1,6 @@
+@AlarmLogViewerApiGateway_HostAddress = http://localhost:5065
+
+GET {{AlarmLogViewerApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

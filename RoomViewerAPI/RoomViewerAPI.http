@@ -1,0 +1,6 @@
+@RoomViewerAPI_HostAddress = http://localhost:5286
+
+GET {{RoomViewerAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
