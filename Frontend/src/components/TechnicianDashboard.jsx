@@ -139,7 +139,7 @@ const TechnicianDashboard = ({ userId }) => {
             ) : (
                 <div className="rooms-grid">
                     {rooms.map(room => (
-                        <div key={room.roomId} className="room-card">
+                        <div key={room.roomId} className="room-card safe-active">
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
                                 <span className="room-id">{room.roomId}</span>

@@ -25,7 +25,12 @@ const fetchWithAuth = async (url, options = {}) => {
         throw new Error(error || 'API request failed');
     }
 
-    return response.json();
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        return text; // Return plain text if not JSON
+    }
 };
 
 export const apiService = {

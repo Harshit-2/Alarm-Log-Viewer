@@ -111,6 +111,11 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
+.room-card.safe-active {
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
 .room-card.alert-active {
     border: 2px solid rgba(239, 68, 68, 0.8);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
