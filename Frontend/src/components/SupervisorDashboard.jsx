@@ -107,8 +107,12 @@ const SupervisorDashboard = () => {
                                 const hasAlert = roomAlerts.length > 0;
                                 const latestAlert = hasAlert ? roomAlerts[roomAlerts.length - 1] : null;
 
+                                const statusClass = hasAlert 
+                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
+                                    : "safe-active";
+
                                 return (
-                                    <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : 'safe-active'}`}>
+                                    <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
                                         <div className="room-header">
                                             <h3>{room.roomName}</h3>
                                             {hasAlert && (

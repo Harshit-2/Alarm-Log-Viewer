@@ -122,6 +122,75 @@
     animation: blink-border 1.5s infinite alternate;
 }
 
+/* Too Hot Animation */
+.room-card.too-hot {
+    overflow: hidden;
+}
+
+.room-card.too-hot::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: radial-gradient(circle at 50% 100%, rgba(249, 115, 22, 0.4), transparent 70%);
+    filter: blur(8px);
+    animation: flicker-fire 2s infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes flicker-fire {
+    0% { transform: translateY(0) scale(1); opacity: 0.8; }
+    50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+    100% { transform: translateY(-5px) scale(0.9); opacity: 0.7; }
+}
+
+/* Too Cold Animation */
+.room-card.too-cold {
+    overflow: hidden;
+    border-color: rgba(56, 189, 248, 0.8) !important;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.5) !important;
+    animation: blink-ice 1.5s infinite alternate !important;
+}
+
+.room-card.too-cold::before {
+    content: '❄️';
+    position: absolute;
+    top: -20px;
+    left: 20%;
+    font-size: 1.5rem;
+    opacity: 0.3;
+    animation: fall-snow 4s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.room-card.too-cold::after {
+    content: '❄️';
+    position: absolute;
+    top: -20px;
+    right: 20%;
+    font-size: 1rem;
+    opacity: 0.2;
+    animation: fall-snow 5s linear infinite 1.5s;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes blink-ice {
+    from { border-color: rgba(56, 189, 248, 0.3); box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
+    to { border-color: rgba(56, 189, 248, 1); box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); }
+}
+
+@keyframes fall-snow {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+}
+
 @keyframes blink-border {
     from {
         border-color: rgba(239, 68, 68, 0.3);
