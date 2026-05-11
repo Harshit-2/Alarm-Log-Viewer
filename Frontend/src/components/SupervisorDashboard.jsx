@@ -74,6 +74,16 @@ const SupervisorDashboard = () => {
                             Users
                         </button>
                     </div>
+                    <button 
+                        className="action-btn" 
+                        style={{ marginTop: 0, padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        onClick={() => {
+                            setLoading(true);
+                            fetchAllData();
+                        }}
+                    >
+                        ↻ Refresh Data
+                    </button>
                     <div className="status-badge">
                         <span className="dot pulse-green"></span> System Active
                     </div>

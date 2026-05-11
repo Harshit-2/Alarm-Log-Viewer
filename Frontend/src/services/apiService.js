@@ -17,7 +17,8 @@ const fetchWithAuth = async (url, options = {}) => {
 
     const response = await fetch(`${GATEWAY_URL}${url}`, {
         ...options,
-        headers
+        headers,
+        cache: 'no-store' // Fixes aggressive browser caching issues (e.g. Chrome not fetching new data on reload/polling)
     });
 
     if (!response.ok) {
