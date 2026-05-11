@@ -29,12 +29,30 @@ const fetchWithAuth = async (url, options = {}) => {
 };
 
 export const apiService = {
+    // Users
+    getUsers: () => fetchWithAuth('/userSvc'),
+    getUser: (id) => fetchWithAuth(`/userSvc/${id}`),
+    updateUser: (id, user) => fetchWithAuth(`/userSvc/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(user)
+    }),
+    deleteUser: (id) => fetchWithAuth(`/userSvc/${id}`, {
+        method: 'DELETE'
+    }),
+
     // Rooms
     getRooms: () => fetchWithAuth('/roomSvc'),
     getRoom: (id) => fetchWithAuth(`/roomSvc/${id}`),
     createRoom: (room) => fetchWithAuth('/roomSvc', {
         method: 'POST',
         body: JSON.stringify(room)
+    }),
+    updateRoom: (id, room) => fetchWithAuth(`/roomSvc/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(room)
+    }),
+    deleteRoom: (id) => fetchWithAuth(`/roomSvc/${id}`, {
+        method: 'DELETE'
     }),
 
     // Temperatures

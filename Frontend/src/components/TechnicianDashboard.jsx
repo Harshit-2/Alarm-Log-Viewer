@@ -9,7 +9,8 @@ const TechnicianDashboard = ({ userId }) => {
     
     // Create Room Modal State
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newRoom, setNewRoom] = useState({ name: '', minTemp: 0, maxTemp: 100 });
+    const [isEditing, setIsEditing] = useState(false);
+    const [newRoom, setNewRoom] = useState({ id: null, name: '', minTemp: 0, maxTemp: 100 });
 
     // Set Temp Modal State
     const [showTempModal, setShowTempModal] = useState(false);
@@ -34,23 +35,45 @@ const TechnicianDashboard = ({ userId }) => {
         }
     };
 
-    const handleCreateRoom = async (e) => {
+    const handleCreateOrUpdateRoom = async (e) => {
         e.preventDefault();
         try {
-            const roomId = 'R' + Math.floor(10000 + Math.random() * 90000); // Generate R12345
-            await apiService.createRoom({
-                roomId: roomId,
-                roomName: newRoom.name,
-                minTemp: newRoom.minTemp,
-                maxTemp: newRoom.maxTemp,
-                createdByUserId: userId,
-                createdAt: new Date().toISOString().split('T')[0]
-            });
+            if (isEditing) {
+                await apiService.updateRoom(newRoom.id, {
+                    roomId: newRoom.id,
+                    roomName: newRoom.name,
+                    minTemp: newRoom.minTemp,
+                    maxTemp: newRoom.maxTemp,
+                    createdByUserId: userId,
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+            } else {
+                const roomId = 'R' + Math.floor(10000 + Math.random() * 90000); // Generate R12345
+                await apiService.createRoom({
+                    roomId: roomId,
+                    roomName: newRoom.name,
+                    minTemp: newRoom.minTemp,
+                    maxTemp: newRoom.maxTemp,
+                    createdByUserId: userId,
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+            }
             setShowCreateModal(false);
-            setNewRoom({ name: '', minTemp: 0, maxTemp: 100 });
+            setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
+            setIsEditing(false);
             fetchRooms(); // Refresh the list
         } catch (err) {
-            alert('Error creating room: ' + err.message);
+            alert(`Error ${isEditing ? 'updating' : 'creating'} room: ` + err.message);
+        }
+    };
+
+    const handleDeleteRoom = async (roomId) => {
+        if (!window.confirm('Are you sure you want to delete this room? This cannot be undone.')) return;
+        try {
+            await apiService.deleteRoom(roomId);
+            fetchRooms();
+        } catch (err) {
+            alert('Error deleting room: ' + err.message);
         }
     };
 
@@ -98,7 +121,11 @@ const TechnicianDashboard = ({ userId }) => {
         <div className="dashboard-wrapper">
             <div className="dashboard-header-flex">
                 <h2>My Rooms</h2>
-                <button className="primary-btn" onClick={() => setShowCreateModal(true)}>
+                <button className="primary-btn" onClick={() => {
+                    setIsEditing(false);
+                    setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
+                    setShowCreateModal(true);
+                }}>
                     + Create New Room
                 </button>
             </div>
@@ -121,15 +148,36 @@ const TechnicianDashboard = ({ userId }) => {
                                 <p><strong>Min Temp:</strong> {room.minTemp}°C</p>
                                 <p><strong>Max Temp:</strong> {room.maxTemp}°C</p>
                             </div>
-                            <button 
-                                className="action-btn"
-                                onClick={() => {
-                                    setSelectedRoom(room);
-                                    setShowTempModal(true);
-                                }}
-                            >
-                                Set Temperature
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                <button 
+                                    className="action-btn"
+                                    style={{ marginTop: 0, flex: 1 }}
+                                    onClick={() => {
+                                        setSelectedRoom(room);
+                                        setShowTempModal(true);
+                                    }}
+                                >
+                                    Set Temp
+                                </button>
+                                <button 
+                                    className="action-btn"
+                                    style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
+                                    onClick={() => {
+                                        setIsEditing(true);
+                                        setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
+                                        setShowCreateModal(true);
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    className="action-btn"
+                                    style={{ marginTop: 0, padding: '0.75rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                    onClick={() => handleDeleteRoom(room.roomId)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -139,8 +187,8 @@ const TechnicianDashboard = ({ userId }) => {
             {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h3>Create a New Room</h3>
-                        <form onSubmit={handleCreateRoom}>
+                        <h3>{isEditing ? 'Edit Room' : 'Create a New Room'}</h3>
+                        <form onSubmit={handleCreateOrUpdateRoom}>
                             <div className="form-group">
                                 <label>Room Name</label>
                                 <input 
@@ -173,7 +221,7 @@ const TechnicianDashboard = ({ userId }) => {
                             </div>
                             <div className="modal-actions">
                                 <button type="button" className="cancel-btn" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                                <button type="submit" className="primary-btn">Create Room</button>
+                                <button type="submit" className="primary-btn">{isEditing ? 'Save Changes' : 'Create Room'}</button>
                             </div>
                         </form>
                     </div>
