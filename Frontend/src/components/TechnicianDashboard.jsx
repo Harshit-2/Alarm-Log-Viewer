@@ -24,10 +24,7 @@ const TechnicianDashboard = ({ userId }) => {
     const fetchRooms = async () => {
         try {
             const data = await apiService.getRooms();
-            // Filter rooms for this technician, though depending on backend it might return all
-            // If the backend has a /roomSvc/creator/{userId} we could use that, but we'll just filter here for safety.
-            const userRooms = data.filter(r => r.createdByUserId === userId);
-            setRooms(userRooms);
+            setRooms(data); // Set all rooms to state
         } catch (err) {
             setError('Failed to load rooms');
         } finally {
