@@ -12,13 +12,16 @@ const fetchWithAuth = async (url, options = {}) => {
     const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
         ...options.headers
     };
 
     const response = await fetch(`${GATEWAY_URL}${url}`, {
+        cache: 'no-store',
         ...options,
-        headers,
-        cache: 'no-store' // Fixes aggressive browser caching issues (e.g. Chrome not fetching new data on reload/polling)
+        headers
     });
 
     if (!response.ok) {
