@@ -7,10 +7,10 @@ const TechnicianDashboard = ({ userId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
-    // Create Room Modal State
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [newRoom, setNewRoom] = useState({ id: null, name: '', minTemp: 0, maxTemp: 100 });
+    const [viewMode, setViewMode] = useState('all'); // 'all' or 'mine'
 
     // Set Temp Modal State
     const [showTempModal, setShowTempModal] = useState(false);
@@ -117,28 +117,48 @@ const TechnicianDashboard = ({ userId }) => {
 
     if (loading) return <div className="loading-state">Loading your rooms...</div>;
 
+    const displayedRooms = viewMode === 'all' 
+        ? rooms 
+        : rooms.filter(room => room.createdByUserId === userId);
+
     return (
         <div className="dashboard-wrapper">
             <div className="dashboard-header-flex">
-                <h2>My Rooms</h2>
-                <button className="primary-btn" onClick={() => {
-                    setIsEditing(false);
-                    setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
-                    setShowCreateModal(true);
-                }}>
-                    + Create New Room
-                </button>
+                <h2>{viewMode === 'all' ? 'All Rooms' : 'My Rooms'}</h2>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="tabs-container">
+                        <button 
+                            className={`tab-btn ${viewMode === 'all' ? 'active' : ''}`}
+                            onClick={() => setViewMode('all')}
+                        >
+                            All Rooms
+                        </button>
+                        <button 
+                            className={`tab-btn ${viewMode === 'mine' ? 'active' : ''}`}
+                            onClick={() => setViewMode('mine')}
+                        >
+                            My Rooms
+                        </button>
+                    </div>
+                    <button className="primary-btn" onClick={() => {
+                        setIsEditing(false);
+                        setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
+                        setShowCreateModal(true);
+                    }}>
+                        + Create New Room
+                    </button>
+                </div>
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
-            {rooms.length === 0 ? (
+            {displayedRooms.length === 0 ? (
                 <div className="empty-state">
-                    <p>You haven't created any rooms yet.</p>
+                    <p>{viewMode === 'all' ? 'There are no rooms registered in the system yet.' : "You haven't created any rooms yet."}</p>
                 </div>
             ) : (
                 <div className="rooms-grid">
-                    {rooms.map(room => (
+                    {displayedRooms.map(room => (
                         <div key={room.roomId} className="room-card safe-active">
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
@@ -159,24 +179,28 @@ const TechnicianDashboard = ({ userId }) => {
                                 >
                                     Set Temp
                                 </button>
-                                <button 
-                                    className="action-btn"
-                                    style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
-                                    onClick={() => {
-                                        setIsEditing(true);
-                                        setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
-                                        setShowCreateModal(true);
-                                    }}
-                                >
-                                    Edit
-                                </button>
-                                <button 
-                                    className="action-btn"
-                                    style={{ marginTop: 0, padding: '0.75rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
-                                    onClick={() => handleDeleteRoom(room.roomId)}
-                                >
-                                    Delete
-                                </button>
+                                {room.createdByUserId === userId && (
+                                    <>
+                                        <button 
+                                            className="action-btn"
+                                            style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
+                                            onClick={() => {
+                                                setIsEditing(true);
+                                                setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
+                                                setShowCreateModal(true);
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            className="action-btn"
+                                            style={{ marginTop: 0, padding: '0.75rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                            onClick={() => handleDeleteRoom(room.roomId)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     ))}
