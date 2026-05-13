@@ -24,7 +24,8 @@ const TechnicianDashboard = ({ userId }) => {
     const fetchRooms = async () => {
         try {
             const data = await apiService.getRooms();
-            setRooms(data); // Set all rooms to state
+            // Prevent crashes if the API returns a string or non-array
+            setRooms(Array.isArray(data) ? data : []); 
         } catch (err) {
             setError('Failed to load rooms');
         } finally {
@@ -114,9 +115,11 @@ const TechnicianDashboard = ({ userId }) => {
 
     if (loading) return <div className="loading-state">Loading your rooms...</div>;
 
+    const safeRooms = Array.isArray(rooms) ? rooms : [];
+
     const displayedRooms = viewMode === 'all' 
-        ? rooms 
-        : rooms.filter(room => room.createdByUserId === userId);
+        ? safeRooms 
+        : safeRooms.filter(room => room.createdByUserId === userId);
 
     return (
         <div className="dashboard-wrapper">

@@ -33,6 +33,9 @@ const SupervisorDashboard = () => {
             setUsers(usersData || []);
         } catch (err) {
             setError('Failed to load dashboard data. Ensure all services are running.');
+            setRooms([]);
+            setAlerts([]);
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -108,14 +111,14 @@ const SupervisorDashboard = () => {
                                 const latestAlert = hasAlert ? roomAlerts[roomAlerts.length - 1] : null;
 
                                 const statusClass = hasAlert 
-                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
+                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : (latestAlert.status === "Too Cold" ? "too-cold" : "safe-active")) 
                                     : "safe-active";
 
                                 return (
-                                    <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
+                                    <div key={room.roomId} className={`room-card ${hasAlert && latestAlert.status !== "Normal" ? 'alert-active' : ''} ${statusClass}`}>
                                         <div className="room-header">
                                             <h3>{room.roomName}</h3>
-                                            {hasAlert && (
+                                            {hasAlert && latestAlert.status !== "Normal" && (
                                                 <div className="blinking-alert-indicator">
                                                     <span className="pulse-red"></span> ALERT
                                                 </div>
