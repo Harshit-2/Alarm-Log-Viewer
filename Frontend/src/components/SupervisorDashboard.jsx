@@ -106,8 +106,10 @@ const SupervisorDashboard = () => {
         return alerts.filter(a => a.roomId === roomId && a.status !== "Resolved");
     };
 
-    // Count only active (unresolved) alerts for the stats display
-    const activeAlerts = alerts.filter(a => a.status !== "Resolved");
+    // Count only active (unresolved) alerts for rooms that still exist
+    const activeAlerts = alerts.filter(a => 
+        a.status !== "Resolved" && rooms.some(r => r.roomId === a.roomId)
+    );
 
     const handleDeleteUser = async (userId) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;

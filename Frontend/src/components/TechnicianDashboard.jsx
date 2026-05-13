@@ -72,6 +72,18 @@ const TechnicianDashboard = ({ userId }) => {
     const handleDeleteRoom = async (roomId) => {
         if (!window.confirm('Are you sure you want to delete this room? This cannot be undone.')) return;
         try {
+            // First, clean up all alerts associated with this room
+            try {
+                const roomAlerts = await apiService.getAlertsByRoom(roomId);
+                if (roomAlerts && roomAlerts.length > 0) {
+                    for (const existingAlert of roomAlerts) {
+                        await apiService.deleteAlert(existingAlert.alertId);
+                    }
+                }
+            } catch {
+                // If alert cleanup fails, still proceed with room deletion
+            }
+
             await apiService.deleteRoom(roomId);
             fetchRooms();
         } catch (err) {
