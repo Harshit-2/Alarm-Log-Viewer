@@ -100,10 +100,14 @@ const SupervisorDashboard = () => {
 
     if (loading && rooms.length === 0) return <div className="loading-state">Loading global monitoring dashboard...</div>;
 
-    // Helper to find if a room has alerts
+    // Helper to find if a room has ACTIVE (unresolved) alerts
+    // Alerts with status "Resolved" are ignored — the room is back to normal
     const getRoomAlerts = (roomId) => {
-        return alerts.filter(a => a.roomId === roomId);
+        return alerts.filter(a => a.roomId === roomId && a.status !== "Resolved");
     };
+
+    // Count only active (unresolved) alerts for the stats display
+    const activeAlerts = alerts.filter(a => a.status !== "Resolved");
 
     const handleDeleteUser = async (userId) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
@@ -163,8 +167,8 @@ const SupervisorDashboard = () => {
                             <div className="stat-value">{rooms.length}</div>
                         </div>
                         <div className="stat-card alert-stat">
-                            <h3>Total Alerts Detected</h3>
-                            <div className="stat-value text-red">{alerts.length}</div>
+                            <h3>Active Alerts</h3>
+                            <div className="stat-value text-red">{activeAlerts.length}</div>
                         </div>
                     </div>
 

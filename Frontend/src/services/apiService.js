@@ -83,5 +83,12 @@ export const apiService = {
     createAlert: (alert) => fetchWithAuth('/alertSvc', {
         method: 'POST',
         body: JSON.stringify(alert)
+    }),
+    updateAlert: (id, alert) => fetchWithAuth(`/alertSvc/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(alert)
+    }),
+    deleteAlert: (id) => fetchWithAuth(`/alertSvc/${id}`, {
+        method: 'DELETE'
     })
 };

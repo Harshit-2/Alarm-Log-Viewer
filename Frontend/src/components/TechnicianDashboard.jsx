@@ -95,8 +95,9 @@ const TechnicianDashboard = ({ userId }) => {
                 recordedAt: new Date().toISOString()
             });
 
-            // 2. Check if it violates min/max bounds and create an Alert if so
+            // 2. Check if it violates min/max bounds
             if (tempVal < selectedRoom.minTemp || tempVal > selectedRoom.maxTemp) {
+                // Temperature is OUT OF RANGE — create a new alert
                 const alertId = 'A' + Math.floor(10000 + Math.random() * 90000);
                 const status = tempVal < selectedRoom.minTemp ? "Too Cold" : "Too Hot";
                 
@@ -109,7 +110,26 @@ const TechnicianDashboard = ({ userId }) => {
                 });
                 alert(`⚠️ Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
             } else {
-                alert('Temperature recorded successfully. All systems normal.');
+                // Temperature is BACK IN RANGE — resolve any existing alerts for this room
+                try {
+                    const roomAlerts = await apiService.getAlertsByRoom(selectedRoom.roomId);
+                    
+                    // Update each unresolved alert to "Resolved" status
+                    if (roomAlerts && roomAlerts.length > 0) {
+                        for (const existingAlert of roomAlerts) {
+                            // Only resolve alerts that are not already resolved
+                            if (existingAlert.status !== "Resolved") {
+                                await apiService.updateAlert(existingAlert.alertId, {
+                                    ...existingAlert,
+                                    status: "Resolved"
+                                });
+                            }
+                        }
+                    }
+                } catch {
+                    // If fetching/updating alerts fails, it's not critical — temp was still saved
+                }
+                alert('✅ Temperature recorded successfully. All systems normal.');
             }
 
             setShowTempModal(false);
