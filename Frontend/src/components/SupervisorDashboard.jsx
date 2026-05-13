@@ -6,8 +6,10 @@ const SupervisorDashboard = () => {
     const [rooms, setRooms] = useState([]);
     const [alerts, setAlerts] = useState([]);
     const [users, setUsers] = useState([]);
+    const [temperatures, setTemperatures] = useState({}); // Map of roomId -> latest temp reading
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [deleteError, setDeleteError] = useState(''); // Error shown when deleting a user fails
     const [warnings, setWarnings] = useState([]); // Tracks which services failed
     const [activeTab, setActiveTab] = useState('monitoring'); // 'monitoring' | 'users'
 
@@ -24,11 +26,12 @@ const SupervisorDashboard = () => {
 
     const fetchAllData = async () => {
         const newWarnings = [];
+        let fetchedRooms = [];
 
         // Fetch Rooms — required for monitoring
         try {
-            const roomsData = await apiService.getRooms();
-            setRooms(roomsData || []);
+            fetchedRooms = await apiService.getRooms() || [];
+            setRooms(fetchedRooms);
         } catch (err) {
             newWarnings.push('⚠️ Room Service is unavailable: ' + err.message);
             setRooms([]);
@@ -52,6 +55,30 @@ const SupervisorDashboard = () => {
             setUsers([]);
         }
 
+        // Fetch Temperatures for each room — check if temperature service is running
+        if (fetchedRooms.length > 0) {
+            try {
+                // Fetch temperatures for all rooms at the same time
+                const tempResults = await Promise.all(
+                    fetchedRooms.map(room => apiService.getTemperaturesByRoom(room.roomId))
+                );
+
+                // Build a map: roomId -> latest temperature reading
+                const tempMap = {};
+                fetchedRooms.forEach((room, index) => {
+                    const readings = tempResults[index];
+                    if (readings && readings.length > 0) {
+                        // The last item in the array is the most recent reading
+                        tempMap[room.roomId] = readings[readings.length - 1];
+                    }
+                });
+                setTemperatures(tempMap);
+            } catch (err) {
+                newWarnings.push('⚠️ Temperature Service is unavailable: ' + err.message);
+                setTemperatures({});
+            }
+        }
+
         setWarnings(newWarnings);
         setError(''); // Clear any old global error
         setLoading(false);
@@ -66,11 +93,13 @@ const SupervisorDashboard = () => {
 
     const handleDeleteUser = async (userId) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
+        setDeleteError('');
         try {
             await apiService.deleteUser(userId);
             fetchAllData(); // Refresh the list
         } catch (err) {
-            alert('Error deleting user: ' + err.message);
+            // Show inline error instead of a browser alert popup
+            setDeleteError('Failed to delete user: ' + err.message);
         }
     };
 
@@ -154,6 +183,17 @@ const SupervisorDashboard = () => {
                                         <div className="room-details">
                                             <p><strong>ID:</strong> {room.roomId}</p>
                                             <p><strong>Safe Range:</strong> {room.minTemp}°C - {room.maxTemp}°C</p>
+
+                                            {/* Show latest temperature reading from Temperature Service */}
+                                            {temperatures[room.roomId] ? (
+                                                <p><strong>Latest Temp:</strong> {temperatures[room.roomId].temperatureValue}°C
+                                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.4rem' }}>
+                                                        at {new Date(temperatures[room.roomId].recordedAt).toLocaleTimeString()}
+                                                    </span>
+                                                </p>
+                                            ) : (
+                                                <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>No temperature recorded yet</p>
+                                            )}
                                             
                                             {hasAlert && (
                                                 <div className="alert-details">
@@ -174,6 +214,8 @@ const SupervisorDashboard = () => {
             {activeTab === 'users' && (
                 <div className="users-management">
                     <h3>User Management</h3>
+                    {/* Show delete error inline instead of a browser popup */}
+                    {deleteError && <div className="error-message" style={{ marginBottom: '1rem' }}>{deleteError}</div>}
                     {users.length === 0 ? (
                         <p>No users found.</p>
                     ) : (
