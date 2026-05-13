@@ -55,27 +55,41 @@ const SupervisorDashboard = () => {
             setUsers([]);
         }
 
-        // Fetch Temperatures for each room — check if temperature service is running
+        // Fetch Temperatures for each room — using Promise.allSettled so one
+        // room with no data doesn't crash the rest
         if (fetchedRooms.length > 0) {
-            try {
-                // Fetch temperatures for all rooms at the same time
-                const tempResults = await Promise.all(
-                    fetchedRooms.map(room => apiService.getTemperaturesByRoom(room.roomId))
-                );
+            // Promise.allSettled waits for ALL fetches to finish,
+            // whether they succeed or fail — no crash!
+            const tempResults = await Promise.allSettled(
+                fetchedRooms.map(room => apiService.getTemperaturesByRoom(room.roomId))
+            );
 
-                // Build a map: roomId -> latest temperature reading
-                const tempMap = {};
-                fetchedRooms.forEach((room, index) => {
-                    const readings = tempResults[index];
+            // Build a map: roomId -> latest temperature reading
+            const tempMap = {};
+            let failedCount = 0;
+
+            fetchedRooms.forEach((room, index) => {
+                const result = tempResults[index];
+
+                if (result.status === 'fulfilled') {
+                    // ✅ Success — store the latest reading if any exist
+                    const readings = result.value;
                     if (readings && readings.length > 0) {
-                        // The last item in the array is the most recent reading
                         tempMap[room.roomId] = readings[readings.length - 1];
                     }
-                });
-                setTemperatures(tempMap);
-            } catch (err) {
-                newWarnings.push('⚠️ Temperature Service is unavailable: ' + err.message);
-                setTemperatures({});
+                    // If readings is empty [], that just means no temp recorded yet — totally fine
+                } else {
+                    // ❌ This room's fetch failed (no data or service error)
+                    failedCount++;
+                }
+            });
+
+            setTemperatures(tempMap);
+
+            // Only warn if ALL rooms failed — that means the service is truly down
+            // If only some failed, it just means those rooms have no temperature data yet
+            if (failedCount === fetchedRooms.length) {
+                newWarnings.push('⚠️ Temperature Service is unavailable: ' + tempResults[0].reason?.message);
             }
         }
 
