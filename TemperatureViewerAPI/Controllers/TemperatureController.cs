@@ -34,8 +34,16 @@ namespace TemperatureWebApi.Controllers
         [HttpGet("room/{roomId}")]
         public async Task<IActionResult> GetByRoom(string roomId)
         {
-            var temp = await _repository.GetByRoomIdAsync(roomId);
-            return Ok(temp);
+            try
+            {
+                var temp = await _repository.GetByRoomIdAsync(roomId);
+                return Ok(temp);
+            }
+            catch (TemperatureException)
+            {
+                // No temperatures recorded for this room yet — return empty list instead of error
+                return Ok(new List<Temperature>());
+            }
         }
 
         [HttpGet("room/{roomId}/latest")]
