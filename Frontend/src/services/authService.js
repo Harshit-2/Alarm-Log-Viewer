@@ -9,19 +9,29 @@ const generateUserId = () => {
 export const authService = {
     async login(email, password) {
         // 1. Verify credentials with User API
-        const userRes = await fetch(`${GATEWAY_URL}/userSvc/credentials?username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+        let userRes;
+        try {
+            userRes = await fetch(`${GATEWAY_URL}/userSvc/credentials?username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+        } catch {
+            throw new Error('Cannot connect to the server. Please make sure all backend services are running.');
+        }
         
         if (!userRes.ok) {
-            throw new Error('Invalid email or password');
+            throw new Error('Invalid email or password.');
         }
         
         const userData = await userRes.json();
         
         // 2. Get JWT Token from Auth API
-        const authRes = await fetch(`${GATEWAY_URL}/authSvc/${encodeURIComponent(userData.username)}/${encodeURIComponent(userData.role)}/${encodeURIComponent(SECRET_KEY)}`);
+        let authRes;
+        try {
+            authRes = await fetch(`${GATEWAY_URL}/authSvc/${encodeURIComponent(userData.username)}/${encodeURIComponent(userData.role)}/${encodeURIComponent(SECRET_KEY)}`);
+        } catch {
+            throw new Error('Cannot connect to the authentication service. Please try again.');
+        }
         
         if (!authRes.ok) {
-            throw new Error('Failed to generate authentication token');
+            throw new Error('Failed to generate authentication token.');
         }
         
         const token = await authRes.text();
@@ -43,17 +53,22 @@ export const authService = {
             createdAt: currentDate
         };
 
-        const res = await fetch(`${GATEWAY_URL}/userSvc`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newUser)
-        });
+        let res;
+        try {
+            res = await fetch(`${GATEWAY_URL}/userSvc`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            });
+        } catch {
+            throw new Error('Cannot connect to the server. Please make sure all backend services are running.');
+        }
 
         if (!res.ok) {
             const err = await res.text();
-            throw new Error(err || 'Registration failed');
+            throw new Error(err || 'Registration failed. Please try again.');
         }
 
         return await res.json();

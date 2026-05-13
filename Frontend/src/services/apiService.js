@@ -3,51 +3,43 @@ import { authService } from './authService';
 const GATEWAY_URL = 'http://localhost:5065';
 
 const fetchWithAuth = async (url, options = {}) => {
+    const token = authService.getToken();
+    
+    if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+    }
+
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        ...options.headers
+    };
+
+    let response;
     try {
-        const token = authService.getToken();
-        
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            ...options.headers
-        };
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
-        const response = await fetch(`${GATEWAY_URL}${url}`, {
+        response = await fetch(`${GATEWAY_URL}${url}`, {
             cache: 'no-store',
-            signal: controller.signal,
             ...options,
             headers
         });
+    } catch (networkError) {
+        // This happens when the server is completely unreachable (e.g. backend is offline)
+        throw new Error('Cannot connect to the server. Please make sure all backend services are running.');
+    }
 
-        clearTimeout(timeoutId);
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || `Server error (${response.status}). Please try again.`);
+    }
 
-        if (!response.ok) {
-            let errorText = '';
-            try { errorText = await response.text(); } catch(e) {}
-            throw new Error(errorText || `API request failed with status ${response.status}`);
-        }
-
-        const text = await response.text();
-        if (!text) return null;
-        
-        try {
-            return JSON.parse(text);
-        } catch {
-            return text; // Return plain text if not JSON
-        }
-    } catch (error) {
-        console.error(`API Error on ${url}:`, error);
-        throw new Error(error.name === 'AbortError' ? 'Request timed out. Please try again later.' : 'Something went wrong, please try again later.');
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        return text; // Return plain text if not JSON
     }
 };
 

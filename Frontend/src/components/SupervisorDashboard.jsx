@@ -8,6 +8,7 @@ const SupervisorDashboard = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [warnings, setWarnings] = useState([]); // Tracks which services failed
     const [activeTab, setActiveTab] = useState('monitoring'); // 'monitoring' | 'users'
 
     useEffect(() => {
@@ -22,20 +23,38 @@ const SupervisorDashboard = () => {
     }, []);
 
     const fetchAllData = async () => {
+        const newWarnings = [];
+
+        // Fetch Rooms — required for monitoring
         try {
-            const [roomsData, alertsData, usersData] = await Promise.all([
-                apiService.getRooms(),
-                apiService.getAlerts(),
-                apiService.getUsers().catch(() => []) // Catch error if User API fails
-            ]);
-            setRooms(roomsData);
+            const roomsData = await apiService.getRooms();
+            setRooms(roomsData || []);
+        } catch (err) {
+            newWarnings.push('⚠️ Room Service is unavailable: ' + err.message);
+            setRooms([]);
+        }
+
+        // Fetch Alerts — optional, dashboard still works without them
+        try {
+            const alertsData = await apiService.getAlerts();
             setAlerts(alertsData || []);
+        } catch (err) {
+            newWarnings.push('⚠️ Alert Service is unavailable: ' + err.message);
+            setAlerts([]);
+        }
+
+        // Fetch Users — optional, dashboard still works without them
+        try {
+            const usersData = await apiService.getUsers();
             setUsers(usersData || []);
         } catch (err) {
-            setError('Failed to load dashboard data. Ensure all services are running.');
-        } finally {
-            setLoading(false);
+            newWarnings.push('⚠️ User Service is unavailable: ' + err.message);
+            setUsers([]);
         }
+
+        setWarnings(newWarnings);
+        setError(''); // Clear any old global error
+        setLoading(false);
     };
 
     if (loading && rooms.length === 0) return <div className="loading-state">Loading global monitoring dashboard...</div>;
@@ -80,12 +99,20 @@ const SupervisorDashboard = () => {
                 </div>
             </div>
 
-            {error ? (
-                <div className="error-message" style={{ margin: '2rem 0', padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '12px' }}>
-                    <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>System Unavailable</h3>
-                    <p style={{ color: '#fca5a5', fontSize: '1.1rem' }}>{error}</p>
+            {/* Show individual service warnings */}
+            {warnings.length > 0 && (
+                <div style={{ marginBottom: '1rem' }}>
+                    {warnings.map((msg, index) => (
+                        <div key={index} className="error-message" style={{ marginBottom: '0.5rem' }}>
+                            {msg}
+                        </div>
+                    ))}
                 </div>
-            ) : activeTab === 'monitoring' ? (
+            )}
+
+            {error && <div className="error-message">{error}</div>}
+
+            {activeTab === 'monitoring' && (
                 <>
                     <div className="supervisor-stats">
                         <div className="stat-card">
@@ -142,7 +169,9 @@ const SupervisorDashboard = () => {
                         </div>
                     )}
                 </>
-            ) : (
+            )}
+
+            {activeTab === 'users' && (
                 <div className="users-management">
                     <h3>User Management</h3>
                     {users.length === 0 ? (

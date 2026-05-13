@@ -11,11 +11,13 @@ const TechnicianDashboard = ({ userId }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newRoom, setNewRoom] = useState({ id: null, name: '', minTemp: 0, maxTemp: 100 });
     const [viewMode, setViewMode] = useState('all'); // 'all' or 'mine'
+    const [modalError, setModalError] = useState(''); // Error shown inside Create/Edit modal
 
     // Set Temp Modal State
     const [showTempModal, setShowTempModal] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [tempValue, setTempValue] = useState('');
+    const [tempError, setTempError] = useState(''); // Error shown inside Set Temp modal
 
     useEffect(() => {
         fetchRooms();
@@ -26,7 +28,7 @@ const TechnicianDashboard = ({ userId }) => {
             const data = await apiService.getRooms();
             setRooms(data); // Set all rooms to state
         } catch (err) {
-            setError('Failed to load rooms');
+            setError('Failed to load rooms. ' + err.message);
         } finally {
             setLoading(false);
         }
@@ -34,6 +36,7 @@ const TechnicianDashboard = ({ userId }) => {
 
     const handleCreateOrUpdateRoom = async (e) => {
         e.preventDefault();
+        setModalError(''); // Clear any previous error
         try {
             if (isEditing) {
                 await apiService.updateRoom(newRoom.id, {
@@ -58,9 +61,11 @@ const TechnicianDashboard = ({ userId }) => {
             setShowCreateModal(false);
             setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
             setIsEditing(false);
+            setModalError('');
             fetchRooms(); // Refresh the list
         } catch (err) {
-            alert(`Error ${isEditing ? 'updating' : 'creating'} room: ` + err.message);
+            // Show error inside the modal instead of a browser alert popup
+            setModalError(`Failed to ${isEditing ? 'update' : 'create'} room: ` + err.message);
         }
     };
 
@@ -70,12 +75,14 @@ const TechnicianDashboard = ({ userId }) => {
             await apiService.deleteRoom(roomId);
             fetchRooms();
         } catch (err) {
-            alert('Error deleting room: ' + err.message);
+            // Show the delete error in the main error banner (no modal is open during delete)
+            setError('Failed to delete room: ' + err.message);
         }
     };
 
     const handleSetTemperature = async (e) => {
         e.preventDefault();
+        setTempError(''); // Clear any previous error
         try {
             const tempVal = parseFloat(tempValue);
             
@@ -100,15 +107,17 @@ const TechnicianDashboard = ({ userId }) => {
                     status: status,
                     alertTime: new Date().toISOString()
                 });
-                alert(`Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
+                alert(`⚠️ Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
             } else {
                 alert('Temperature recorded successfully. All systems normal.');
             }
 
             setShowTempModal(false);
             setTempValue('');
+            setTempError('');
         } catch (err) {
-            alert('Error setting temperature: ' + err.message);
+            // Show error inside the modal instead of a browser alert popup
+            setTempError('Failed to record temperature: ' + err.message);
         }
     };
 
@@ -140,6 +149,7 @@ const TechnicianDashboard = ({ userId }) => {
                     <button className="primary-btn" onClick={() => {
                         setIsEditing(false);
                         setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
+                        setModalError('');
                         setShowCreateModal(true);
                     }}>
                         + Create New Room
@@ -147,12 +157,9 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             </div>
 
-            {error ? (
-                <div className="error-message" style={{ margin: '2rem 0', padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '12px' }}>
-                    <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>System Unavailable</h3>
-                    <p style={{ color: '#fca5a5', fontSize: '1.1rem' }}>{error}</p>
-                </div>
-            ) : displayedRooms.length === 0 ? (
+            {error && <div className="error-message">{error}</div>}
+
+            {displayedRooms.length === 0 ? (
                 <div className="empty-state">
                     <p>{viewMode === 'all' ? 'There are no rooms registered in the system yet.' : "You haven't created any rooms yet."}</p>
                 </div>
@@ -212,6 +219,8 @@ const TechnicianDashboard = ({ userId }) => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>{isEditing ? 'Edit Room' : 'Create a New Room'}</h3>
+                        {/* Show error inside the modal so the user sees it without the modal closing */}
+                        {modalError && <div className="error-message" style={{ marginBottom: '1rem' }}>{modalError}</div>}
                         <form onSubmit={handleCreateOrUpdateRoom}>
                             <div className="form-group">
                                 <label>Room Name</label>
@@ -258,6 +267,8 @@ const TechnicianDashboard = ({ userId }) => {
                     <div className="modal-content">
                         <h3>Set Temperature for {selectedRoom?.roomName}</h3>
                         <p className="modal-subtitle">Safe range: {selectedRoom?.minTemp}°C - {selectedRoom?.maxTemp}°C</p>
+                        {/* Show error inside the modal so the user sees it without the modal closing */}
+                        {tempError && <div className="error-message" style={{ marginBottom: '1rem' }}>{tempError}</div>}
                         <form onSubmit={handleSetTemperature}>
                             <div className="form-group">
                                 <label>Current Temperature (°C)</label>
