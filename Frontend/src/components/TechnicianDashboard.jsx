@@ -24,8 +24,7 @@ const TechnicianDashboard = ({ userId }) => {
     const fetchRooms = async () => {
         try {
             const data = await apiService.getRooms();
-            // Prevent crashes if the API returns a string or non-array
-            setRooms(Array.isArray(data) ? data : []); 
+            setRooms(data); // Set all rooms to state
         } catch (err) {
             setError('Failed to load rooms');
         } finally {
@@ -115,11 +114,9 @@ const TechnicianDashboard = ({ userId }) => {
 
     if (loading) return <div className="loading-state">Loading your rooms...</div>;
 
-    const safeRooms = Array.isArray(rooms) ? rooms : [];
-
     const displayedRooms = viewMode === 'all' 
-        ? safeRooms 
-        : safeRooms.filter(room => room.createdByUserId === userId);
+        ? rooms 
+        : rooms.filter(room => room.createdByUserId === userId);
 
     return (
         <div className="dashboard-wrapper">
@@ -150,9 +147,12 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             </div>
 
-            {error && <div className="error-message">{error}</div>}
-
-            {displayedRooms.length === 0 ? (
+            {error ? (
+                <div className="error-message" style={{ margin: '2rem 0', padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '12px' }}>
+                    <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>System Unavailable</h3>
+                    <p style={{ color: '#fca5a5', fontSize: '1.1rem' }}>{error}</p>
+                </div>
+            ) : displayedRooms.length === 0 ? (
                 <div className="empty-state">
                     <p>{viewMode === 'all' ? 'There are no rooms registered in the system yet.' : "You haven't created any rooms yet."}</p>
                 </div>

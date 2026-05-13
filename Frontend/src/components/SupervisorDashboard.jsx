@@ -33,9 +33,6 @@ const SupervisorDashboard = () => {
             setUsers(usersData || []);
         } catch (err) {
             setError('Failed to load dashboard data. Ensure all services are running.');
-            setRooms([]);
-            setAlerts([]);
-            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -83,9 +80,12 @@ const SupervisorDashboard = () => {
                 </div>
             </div>
 
-            {error && <div className="error-message">{error}</div>}
-
-            {activeTab === 'monitoring' && (
+            {error ? (
+                <div className="error-message" style={{ margin: '2rem 0', padding: '3rem', textAlign: 'center', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '12px' }}>
+                    <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>System Unavailable</h3>
+                    <p style={{ color: '#fca5a5', fontSize: '1.1rem' }}>{error}</p>
+                </div>
+            ) : activeTab === 'monitoring' ? (
                 <>
                     <div className="supervisor-stats">
                         <div className="stat-card">
@@ -111,14 +111,14 @@ const SupervisorDashboard = () => {
                                 const latestAlert = hasAlert ? roomAlerts[roomAlerts.length - 1] : null;
 
                                 const statusClass = hasAlert 
-                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : (latestAlert.status === "Too Cold" ? "too-cold" : "safe-active")) 
+                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
                                     : "safe-active";
 
                                 return (
-                                    <div key={room.roomId} className={`room-card ${hasAlert && latestAlert.status !== "Normal" ? 'alert-active' : ''} ${statusClass}`}>
+                                    <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
                                         <div className="room-header">
                                             <h3>{room.roomName}</h3>
-                                            {hasAlert && latestAlert.status !== "Normal" && (
+                                            {hasAlert && (
                                                 <div className="blinking-alert-indicator">
                                                     <span className="pulse-red"></span> ALERT
                                                 </div>
@@ -142,9 +142,7 @@ const SupervisorDashboard = () => {
                         </div>
                     )}
                 </>
-            )}
-
-            {activeTab === 'users' && (
+            ) : (
                 <div className="users-management">
                     <h3>User Management</h3>
                     {users.length === 0 ? (
