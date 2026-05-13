@@ -52,9 +52,10 @@ namespace AlarmLogViewerAPI.Controllers
                 var roomAlerts = await alertRepo.GetByRoomIdAsync(roomId);
                 return Ok(roomAlerts);
             }
-            catch (AlertException ex)
+            catch (AlertException)
             {
-                return NotFound(ex.Message);
+                // No alerts found for this room yet — return empty list instead of error
+                return Ok(new List<Alert>());
             }
         }
 
@@ -114,9 +115,9 @@ namespace AlarmLogViewerAPI.Controllers
             try
             {
                 await alertRepo.DeleteAsync(id);
-                return Ok("User deleted successfully");
+                return Ok("Alert deleted successfully");
             }
-            catch (UserException ex)
+            catch (AlertException ex)  // Fixed: was catching wrong exception type (UserException)
             {
                 return NotFound(ex.Message);
             }

@@ -16,10 +16,10 @@ const SupervisorDashboard = () => {
     useEffect(() => {
         fetchAllData();
         
-        // Polling for updates every 10 seconds to see new alerts dynamically
+        // Polling for updates every 5 seconds to see new alerts dynamically
         const interval = setInterval(() => {
             fetchAllData();
-        }, 10000);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, []);
