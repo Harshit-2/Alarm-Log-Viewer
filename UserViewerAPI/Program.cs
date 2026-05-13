@@ -35,8 +35,8 @@ builder.Services.AddSwaggerGen(options =>
         ValidateIssuer = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "https://www.snrao.com",
-        ValidAudience = "https://www.snrao.com",
+        ValidIssuer = "https://www.google.com",
+        ValidAudience = "https://www.google.com",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("I am Bond, James Bond. I am the best spy in the world. I am invincible."))
     };
 });
