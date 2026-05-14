@@ -11,7 +11,7 @@ using RoomsLibrary.Models;
 namespace RoomsLibrary.Migrations
 {
     [DbContext(typeof(RoomDbContext))]
-    [Migration("20260510194034_InitialMigration")]
+    [Migration("20260514193648_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

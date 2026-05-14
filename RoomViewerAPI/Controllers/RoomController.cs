@@ -8,7 +8,7 @@ namespace RoomViewerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class RoomController : ControllerBase
     {
         private readonly IRoomRepository roomRepo;

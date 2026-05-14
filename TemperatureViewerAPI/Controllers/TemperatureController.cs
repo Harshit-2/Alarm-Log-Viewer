@@ -7,7 +7,7 @@ namespace TemperatureWebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class TemperatureController : ControllerBase
     {
         private readonly ITemperatureRepository _repository;

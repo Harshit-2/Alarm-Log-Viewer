@@ -8,7 +8,7 @@ namespace AlarmLogViewerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AlertController : ControllerBase
     {
         private readonly IAlertRepository alertRepo;
