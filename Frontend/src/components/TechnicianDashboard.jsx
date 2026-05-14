@@ -262,17 +262,26 @@ const TechnicianDashboard = ({ userId }) => {
                                     Set Temp
                                 </button>
                                 {room.createdByUserId === userId && (
-                                    <button 
-                                        className="action-btn"
-                                        style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
-                                        onClick={() => {
-                                            setIsEditing(true);
-                                            setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
-                                            setShowCreateModal(true);
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
+                                    <>
+                                        <button 
+                                            className="action-btn"
+                                            style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
+                                            onClick={() => {
+                                                setIsEditing(true);
+                                                setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
+                                                setShowCreateModal(true);
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            className="action-btn"
+                                            style={{ marginTop: 0, flex: 1, borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                            onClick={() => handleDeleteRoom(room.roomId)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
                                 )}
                                 {/* File Reason button — only shown when there is an active (unresolved) alert */}
                                 {activeAlert && (
