@@ -28,6 +28,11 @@ const TechnicianDashboard = ({ userId }) => {
 
     useEffect(() => {
         fetchData();
+
+        const interval = setInterval(() => {
+            fetchData();
+        }, 50000); // Refresh data every 50 seconds to keep alerts up-to-date
+        return () => clearInterval(interval);
     }, []);
 
 
