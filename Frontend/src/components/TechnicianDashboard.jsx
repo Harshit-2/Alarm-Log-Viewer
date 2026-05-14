@@ -55,6 +55,13 @@ const TechnicianDashboard = ({ userId }) => {
     const handleCreateOrUpdateRoom = async (e) => {
         e.preventDefault();
         setModalError(''); // Clear any previous error
+
+        // Validate: max temperature must be greater than min temperature
+        if (parseFloat(newRoom.maxTemp) <= parseFloat(newRoom.minTemp)) {
+            setModalError('Maximum temperature must be greater than minimum temperature.');
+            return; // Stop here — do not call the API
+        }
+
         try {
             if (isEditing) {
                 await apiService.updateRoom(newRoom.id, {
