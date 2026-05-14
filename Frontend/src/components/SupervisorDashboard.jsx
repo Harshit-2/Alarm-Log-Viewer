@@ -220,6 +220,48 @@ const SupervisorDashboard = () => {
                                                     <p className="text-red"><strong>Status:</strong> {latestAlert.status}</p>
                                                     <p className="text-red"><strong>Recorded Temp:</strong> {latestAlert.temperature}°C</p>
                                                     <p className="alert-time">At: {new Date(latestAlert.alertTime).toLocaleString()}</p>
+                                                    {/* Show the reason filed by the technician */}
+                                                    {latestAlert.reason ? (
+                                                        <p style={{ color: '#facc15', marginTop: '0.4rem' }}>
+                                                            <strong>Technician reason:</strong> {latestAlert.reason}
+                                                        </p>
+                                                    ) : (
+                                                        <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '0.4rem' }}>
+                                                            No reason filed yet by technician.
+                                                        </p>
+                                                    )}
+                                                    {/* Supervisor actions */}
+                                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                                        <button
+                                                            className="action-btn"
+                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#22c55e', color: '#22c55e', background: 'transparent' }}
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await apiService.updateAlert(latestAlert.alertId, { ...latestAlert, status: 'Resolved' });
+                                                                    fetchAllData();
+                                                                } catch (err) {
+                                                                    setDeleteError('Failed to resolve alert: ' + err.message);
+                                                                }
+                                                            }}
+                                                        >
+                                                            ✅ Mark Resolved
+                                                        </button>
+                                                        <button
+                                                            className="action-btn"
+                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                                            onClick={async () => {
+                                                                if (!window.confirm('Delete this alert permanently?')) return;
+                                                                try {
+                                                                    await apiService.deleteAlert(latestAlert.alertId);
+                                                                    fetchAllData();
+                                                                } catch (err) {
+                                                                    setDeleteError('Failed to delete alert: ' + err.message);
+                                                                }
+                                                            }}
+                                                        >
+                                                            🗑️ Delete Alert
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

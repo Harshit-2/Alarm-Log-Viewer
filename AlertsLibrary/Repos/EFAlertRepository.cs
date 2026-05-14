@@ -65,6 +65,7 @@ namespace AlertsLibrary.Repos
                 existingAlert.Temperature = alert.Temperature;
                 existingAlert.Status = alert.Status;
                 existingAlert.AlertTime = alert.AlertTime;
+                existingAlert.Reason = alert.Reason; // Save the technician's filed reason
 
                 await context.SaveChangesAsync();
             }

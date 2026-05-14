@@ -4,6 +4,7 @@ import './Dashboards.css';
 
 const TechnicianDashboard = ({ userId }) => {
     const [rooms, setRooms] = useState([]);
+    const [allAlerts, setAllAlerts] = useState([]); // All alerts for all rooms
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
@@ -19,19 +20,36 @@ const TechnicianDashboard = ({ userId }) => {
     const [tempValue, setTempValue] = useState('');
     const [tempError, setTempError] = useState(''); // Error shown inside Set Temp modal
 
+    // File Reason Modal State
+    const [showReasonModal, setShowReasonModal] = useState(false);
+    const [alertForReason, setAlertForReason] = useState(null); // The alert being explained
+    const [reasonValue, setReasonValue] = useState('');
+    const [reasonError, setReasonError] = useState('');
+
     useEffect(() => {
-        fetchRooms();
+        fetchData();
     }, []);
 
-    const fetchRooms = async () => {
+
+    const fetchData = async () => {
         try {
             const data = await apiService.getRooms();
-            setRooms(data); // Set all rooms to state
+            setRooms(data);
         } catch (err) {
             setError('Failed to load rooms. ' + err.message);
-        } finally {
-            setLoading(false);
         }
+        try {
+            const alertData = await apiService.getAlerts();
+            setAllAlerts(alertData || []);
+        } catch {
+            // Alerts not critical — rooms still show even if alert fetch fails
+        }
+        setLoading(false);
+    };
+
+    // Returns the latest ACTIVE (unresolved) alert for a given room, or null
+    const getActiveAlert = (roomId) => {
+        return allAlerts.find(a => a.roomId === roomId && a.status !== 'Resolved') || null;
     };
 
     const handleCreateOrUpdateRoom = async (e) => {
@@ -62,7 +80,7 @@ const TechnicianDashboard = ({ userId }) => {
             setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
             setIsEditing(false);
             setModalError('');
-            fetchRooms(); // Refresh the list
+            fetchData(); // Refresh the list
         } catch (err) {
             // Show error inside the modal instead of a browser alert popup
             setModalError(`Failed to ${isEditing ? 'update' : 'create'} room: ` + err.message);
@@ -85,10 +103,27 @@ const TechnicianDashboard = ({ userId }) => {
             }
 
             await apiService.deleteRoom(roomId);
-            fetchRooms();
+            fetchData();
         } catch (err) {
             // Show the delete error in the main error banner (no modal is open during delete)
             setError('Failed to delete room: ' + err.message);
+        }
+    };
+
+    // Handles filing a reason for an active alert
+    const handleFileReason = async (e) => {
+        e.preventDefault();
+        setReasonError('');
+        try {
+            await apiService.updateAlert(alertForReason.alertId, {
+                ...alertForReason,
+                reason: reasonValue
+            });
+            setShowReasonModal(false);
+            setReasonValue('');
+            fetchData(); // Refresh so the filed reason appears
+        } catch (err) {
+            setReasonError('Failed to file reason: ' + err.message);
         }
     };
 
@@ -197,7 +232,9 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             ) : (
                 <div className="rooms-grid">
-                    {displayedRooms.map(room => (
+                    {displayedRooms.map(room => {
+                        const activeAlert = getActiveAlert(room.roomId);
+                        return (
                         <div key={room.roomId} className="room-card safe-active">
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
@@ -206,6 +243,12 @@ const TechnicianDashboard = ({ userId }) => {
                             <div className="room-details">
                                 <p><strong>Min Temp:</strong> {room.minTemp}°C</p>
                                 <p><strong>Max Temp:</strong> {room.maxTemp}°C</p>
+                                {/* Show if a reason has already been filed for an active alert */}
+                                {activeAlert && activeAlert.reason && (
+                                    <p style={{ color: '#facc15', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                        <strong>Reason filed:</strong> {activeAlert.reason}
+                                    </p>
+                                )}
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
                                 <button 
@@ -219,30 +262,37 @@ const TechnicianDashboard = ({ userId }) => {
                                     Set Temp
                                 </button>
                                 {room.createdByUserId === userId && (
-                                    <>
-                                        <button 
-                                            className="action-btn"
-                                            style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
-                                            onClick={() => {
-                                                setIsEditing(true);
-                                                setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
-                                                setShowCreateModal(true);
-                                            }}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button 
-                                            className="action-btn"
-                                            style={{ marginTop: 0, padding: '0.75rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
-                                            onClick={() => handleDeleteRoom(room.roomId)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </>
+                                    <button 
+                                        className="action-btn"
+                                        style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                            setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
+                                            setShowCreateModal(true);
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                )}
+                                {/* File Reason button — only shown when there is an active (unresolved) alert */}
+                                {activeAlert && (
+                                    <button
+                                        className="action-btn"
+                                        style={{ marginTop: 0, flex: 1, borderColor: '#f97316', color: '#f97316', background: 'transparent' }}
+                                        onClick={() => {
+                                            setAlertForReason(activeAlert);
+                                            setReasonValue(activeAlert.reason || '');
+                                            setReasonError('');
+                                            setShowReasonModal(true);
+                                        }}
+                                    >
+                                        📋 File Reason
+                                    </button>
                                 )}
                             </div>
                         </div>
-                    ))}
+                    );
+                    })}
                 </div>
             )}
 
@@ -316,6 +366,44 @@ const TechnicianDashboard = ({ userId }) => {
                             <div className="modal-actions">
                                 <button type="button" className="cancel-btn" onClick={() => setShowTempModal(false)}>Cancel</button>
                                 <button type="submit" className="primary-btn">Record Reading</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* File Reason Modal — appears when technician clicks "File Reason" on a room with an active alert */}
+            {showReasonModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>📋 File Reason for Alert</h3>
+                        <p className="modal-subtitle">
+                            Room alert: <strong>{alertForReason?.status}</strong> at {alertForReason?.temperature}°C
+                        </p>
+                        {reasonError && <div className="error-message" style={{ marginBottom: '1rem' }}>{reasonError}</div>}
+                        <form onSubmit={handleFileReason}>
+                            <div className="form-group">
+                                <label>Select Reason</label>
+                                <select
+                                    required
+                                    value={reasonValue}
+                                    onChange={(e) => setReasonValue(e.target.value)}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155' }}
+                                >
+                                    <option value="">-- Choose a reason --</option>
+                                    <option value="Equipment malfunction">Equipment malfunction</option>
+                                    <option value="Power outage">Power outage</option>
+                                    <option value="AC / Cooling failure">AC / Cooling failure</option>
+                                    <option value="Ventilation issue">Ventilation issue</option>
+                                    <option value="External heat source">External heat source</option>
+                                    <option value="Human error">Human error</option>
+                                    <option value="Under investigation">Under investigation</option>
+                                    <option value="Other">Other (see notes below)</option>
+                                </select>
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="cancel-btn" onClick={() => setShowReasonModal(false)}>Cancel</button>
+                                <button type="submit" className="primary-btn">Submit Reason</button>
                             </div>
                         </form>
                     </div>
