@@ -66,6 +66,7 @@ namespace AlertsLibrary.Repos
                 existingAlert.Status = alert.Status;
                 existingAlert.AlertTime = alert.AlertTime;
                 existingAlert.Reason = alert.Reason; // Save the technician's filed reason
+                existingAlert.ResolutionNote = alert.ResolutionNote; // Save the supervisor's resolution note
 
                 await context.SaveChangesAsync();
             }
@@ -114,6 +115,28 @@ namespace AlertsLibrary.Repos
             {
                 throw new AlertException(ex.Message);
             }
+        }
+
+        // Saves a log entry to the ActivityLogs table in the database
+        // Call this whenever a technician or supervisor does something important
+        public async Task LogActivityAsync(string action, string details)
+        {
+            var log = new ActivityLog
+            {
+                Action = action,
+                Details = details,
+                Timestamp = DateTime.Now  // Current date and time
+            };
+            await context.ActivityLogs.AddAsync(log);
+            await context.SaveChangesAsync();
+        }
+
+        // Returns all activity logs so supervisors can see the full history
+        public async Task<List<ActivityLog>> GetAllLogsAsync()
+        {
+            return await context.ActivityLogs
+                .OrderByDescending(log => log.Timestamp) // Newest first
+                .ToListAsync();
         }
     }
 }

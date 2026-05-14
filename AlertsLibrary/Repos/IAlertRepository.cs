@@ -15,5 +15,11 @@ namespace AlertsLibrary.Repos
         Task UpdateAlertAsync(string id, Alert alert);
         Task DeleteAsync(string id);
         Task AddRoomStubAsync(Room room);
+
+        // Saves a log entry to the database with the action name, details, and current timestamp
+        Task LogActivityAsync(string action, string details);
+
+        // Gets all activity logs (supervisor can view the full history)
+        Task<List<ActivityLog>> GetAllLogsAsync();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +17,9 @@ namespace AlertsLibrary.Models
 
         public virtual DbSet<Alert> Alerts { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
+
+        // Stores a log of every important action done by technicians and supervisors
+        public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

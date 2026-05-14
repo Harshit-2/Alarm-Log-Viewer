@@ -12,9 +12,14 @@ namespace RoomViewerAPI.Controllers
     public class RoomController : ControllerBase
     {
         private readonly IRoomRepository roomRepo;
-        public RoomController(IRoomRepository roomRepository)
+
+        // ILogger writes messages to the console so developers can see what is happening
+        private readonly ILogger<RoomController> _logger;
+
+        public RoomController(IRoomRepository roomRepository, ILogger<RoomController> logger)
         {
             roomRepo = roomRepository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -68,7 +73,12 @@ namespace RoomViewerAPI.Controllers
             try
             {
                 await roomRepo.AddAsync(room);
-                
+
+                // Log room creation to console
+                _logger.LogInformation(
+                    "ROOM CREATED — RoomId: {RoomId}, Name: {Name}, MinTemp: {Min}°C, MaxTemp: {Max}°C, CreatedBy: {UserId}",
+                    room.RoomId, room.RoomName, room.MinTemp, room.MaxTemp, room.CreatedByUserId);
+
                 HttpClient tempHttp = new HttpClient() { BaseAddress = new Uri("http://localhost:5155/api/Temperature/") };
                 await tempHttp.PostAsJsonAsync("Room", new { RoomId = room.RoomId });
 
@@ -80,6 +90,7 @@ namespace RoomViewerAPI.Controllers
 
             catch (RoomException ex)
             {
+                _logger.LogError("Failed to create room {RoomId}: {Error}", room.RoomId, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -92,10 +103,14 @@ namespace RoomViewerAPI.Controllers
             try
             {
                 await roomRepo.UpdateAsync(room.RoomId, room);
+                _logger.LogInformation(
+                    "ROOM UPDATED — RoomId: {RoomId}, Name: {Name}, MinTemp: {Min}°C, MaxTemp: {Max}°C",
+                    room.RoomId, room.RoomName, room.MinTemp, room.MaxTemp);
                 return Ok(room);
             }
             catch (RoomException ex)
             {
+                _logger.LogError("Failed to update room {RoomId}: {Error}", room.RoomId, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -109,10 +124,12 @@ namespace RoomViewerAPI.Controllers
             try
             {
                 await roomRepo.DeleteAsync(id);
+                _logger.LogInformation("ROOM DELETED — RoomId: {RoomId}", id);
                 return Ok("Room deleted successfully");
             }
             catch (RoomException ex)
             {
+                _logger.LogError("Failed to delete room {RoomId}: {Error}", id, ex.Message);
                 return NotFound(ex.Message);
             }
         }

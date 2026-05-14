@@ -12,9 +12,13 @@ namespace TemperatureWebApi.Controllers
     {
         private readonly ITemperatureRepository _repository;
 
-        public TemperatureController(ITemperatureRepository repository)
+        // ILogger writes messages to the console so developers can see what is happening
+        private readonly ILogger<TemperatureController> _logger;
+
+        public TemperatureController(ITemperatureRepository repository, ILogger<TemperatureController> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -57,6 +61,12 @@ namespace TemperatureWebApi.Controllers
         public async Task<IActionResult> Create([FromBody] Temperature temperature)
         {
             await _repository.AddAsync(temperature);
+
+            // Log temperature recording to console
+            _logger.LogInformation(
+                "TEMPERATURE RECORDED — ReadingId: {Id}, RoomId: {RoomId}, Value: {Temp}°C",
+                temperature.ReadingId, temperature.RoomId, temperature.TemperatureValue);
+
             return CreatedAtAction(nameof(GetById), new { id = temperature.ReadingId }, temperature);
         }
 
@@ -64,6 +74,9 @@ namespace TemperatureWebApi.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] Temperature temperature)
         {
             await _repository.UpdateAsync(id, temperature);
+            _logger.LogInformation(
+                "TEMPERATURE UPDATED — ReadingId: {Id}, RoomId: {RoomId}, NewValue: {Temp}°C",
+                id, temperature.RoomId, temperature.TemperatureValue);
             return NoContent();
         }
 

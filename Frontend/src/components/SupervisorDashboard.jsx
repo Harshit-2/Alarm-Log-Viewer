@@ -13,6 +13,12 @@ const SupervisorDashboard = () => {
     const [warnings, setWarnings] = useState([]); // Tracks which services failed
     const [activeTab, setActiveTab] = useState('monitoring'); // 'monitoring' | 'users'
 
+    // Resolve Alert Modal state
+    const [showResolveModal, setShowResolveModal] = useState(false);
+    const [alertToResolve, setAlertToResolve] = useState(null); // Which alert is being resolved
+    const [resolveNote, setResolveNote] = useState('');          // Supervisor's resolution note
+    const [resolveError, setResolveError] = useState('');
+
     useEffect(() => {
         fetchAllData();
         
@@ -235,13 +241,12 @@ const SupervisorDashboard = () => {
                                                         <button
                                                             className="action-btn"
                                                             style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#22c55e', color: '#22c55e', background: 'transparent' }}
-                                                            onClick={async () => {
-                                                                try {
-                                                                    await apiService.updateAlert(latestAlert.alertId, { ...latestAlert, status: 'Resolved' });
-                                                                    fetchAllData();
-                                                                } catch (err) {
-                                                                    setDeleteError('Failed to resolve alert: ' + err.message);
-                                                                }
+                                                            onClick={() => {
+                                                                // Open the resolve modal instead of directly resolving
+                                                                setAlertToResolve(latestAlert);
+                                                                setResolveNote('');
+                                                                setResolveError('');
+                                                                setShowResolveModal(true);
                                                             }}
                                                         >
                                                             ✅ Mark Resolved
@@ -306,12 +311,56 @@ const SupervisorDashboard = () => {
                                             >
                                                 Delete
                                             </button>
-                                        </td>
+                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     )}
+                </div>
+            )}
+
+            {/* Resolve Alert Modal — supervisor writes what steps they took to fix the issue */}
+            {showResolveModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>✅ Resolve Alert</h3>
+                        <p className="modal-subtitle">
+                            Please describe what the issue was and the steps taken to fix it.
+                        </p>
+                        {resolveError && <div className="error-message" style={{ marginBottom: '1rem' }}>{resolveError}</div>}
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            setResolveError('');
+                            try {
+                                await apiService.updateAlert(alertToResolve.alertId, {
+                                    ...alertToResolve,
+                                    status: 'Resolved',
+                                    resolutionNote: resolveNote
+                                });
+                                setShowResolveModal(false);
+                                setResolveNote('');
+                                fetchAllData();
+                            } catch (err) {
+                                setResolveError('Failed to resolve: ' + err.message);
+                            }
+                        }}>
+                            <div className="form-group">
+                                <label>Resolution Notes <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>(optional)</span></label>
+                                <textarea
+                                    rows={4}
+                                    value={resolveNote}
+                                    onChange={(e) => setResolveNote(e.target.value)}
+                                    placeholder="e.g. The AC unit was overheating due to a clogged filter. The filter was cleaned and the unit was restarted. Temperature returned to normal."
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155', resize: 'vertical' }}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="cancel-btn" onClick={() => setShowResolveModal(false)}>Cancel</button>
+                                <button type="submit" className="primary-btn">Submit Resolution</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>
