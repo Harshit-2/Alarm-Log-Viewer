@@ -8,7 +8,7 @@ namespace UserViewerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepo;
@@ -97,6 +97,7 @@ namespace UserViewerAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult> Delete(string id)

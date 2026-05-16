@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
 import './Dashboards.css';
 
 const SupervisorDashboard = () => {
+    const { user: currentUser } = useAuth();
     const [rooms, setRooms] = useState([]);
     const [alerts, setAlerts] = useState([]);
     const [users, setUsers] = useState([]);
@@ -304,13 +306,15 @@ const SupervisorDashboard = () => {
                                         <td><span className={`role-badge ${u.role}`}>{u.role}</span></td>
                                         <td>{u.createdAt}</td>
                                         <td>
-                                            <button 
-                                                className="action-btn"
-                                                style={{ padding: '0.4rem 0.8rem', marginTop: 0, borderColor: '#ef4444', color: '#ef4444' }}
-                                                onClick={() => handleDeleteUser(u.userId)}
-                                            >
-                                                Delete
-                                            </button>
+                                            {currentUser?.role === 'Admin' && (
+                                                <button 
+                                                    className="action-btn"
+                                                    style={{ padding: '0.4rem 0.8rem', marginTop: 0, borderColor: '#ef4444', color: '#ef4444' }}
+                                                    onClick={() => handleDeleteUser(u.userId)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
                                          </td>
                                     </tr>
                                 ))}
