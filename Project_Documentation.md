@@ -109,7 +109,7 @@ This system is built using a **Microservices Architecture**. Instead of one mono
       ┌───────────────────────────┼───────────────────────────┐
       ▼                           ▼                           ▼
 ┌──────────────┐            ┌──────────────┐            ┌──────────────┐
-│ Authentication│            │  User API    │            │  Room API    │
+│Authentication│            │  User API    │            │  Room API    │
 │  (Port 5228) │            │ (Port 5025)  │            │ (Port 5286)  │
 └──────────────┘            └──────┬───────┘            └──────┬───────┘
                                    ▼                           ▼
