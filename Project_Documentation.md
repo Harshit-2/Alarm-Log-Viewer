@@ -1,603 +1,541 @@
 # Alarm Log Viewer — Complete Project Documentation
-### A Beginner-Friendly Guide from A to Z
+### A Beginner-Friendly Guide from A to Z for Freshers
 
 ---
 
 ## Table of Contents
 1. What Is This Project?
-2. Technologies Used & Why
-3. Project Architecture — The Big Picture
+2. Technologies Used & Why (Detailed Explanations)
+3. Project Architecture — The Big Picture (Microservices)
 4. How All Services Connect (Port Map)
-5. User Roles & What They Can Do
+5. User Roles & What They Can Do (Technician, Supervisor, Admin)
 6. Database Design — All Tables Explained
-7. Backend Services — Explained One by One
-8. The API Gateway — The Traffic Controller
-9. Authentication — How Login Works
-10. Frontend — How the UI Works
-11. Complete Request Flow — Step by Step
-12. ILogger & Activity Logs
-13. Alert Lifecycle — From Trigger to Resolution
-14. Validation & Error Handling
-15. Key Files Reference
+7. Backend Services & Custom Controllers
+8. Role-Based Security & Authorization (How Admin is Secured)
+9. The API Gateway — The Traffic Controller (Ocelot)
+10. Authentication & JWT Tokens — How Login Works
+11. Frontend — How the UI Works (React + Dashboards)
+12. Complete Request Flow — Step by Step
+13. Logging Systems — ILogger & Database Activity Logs
+14. Alert Lifecycle — From Trigger to Resolution
+15. Validation, Safety, & Error Handling
+16. Key Files Reference & Directory Map
+17. How to Run the Complete Project
 
 ---
 
 ## 1. What Is This Project?
 
-The **Alarm Log Viewer** is a web application that monitors the temperature of multiple rooms in real time.
+The **Alarm Log Viewer** is a complete, real-time temperature monitoring and alerting system designed using a modern microservice-based architecture.
 
-Imagine a hospital, a data centre, or a cold storage warehouse. All of these places have rooms that must stay within a specific temperature range. If the temperature goes too high or too low, someone needs to be notified immediately.
+Imagine a hospital storing vaccines, a large tech data centre hosting servers, or a cold-chain storage warehouse. In all of these environments, temperature control is critical. If a room gets too hot or too cold, the items inside could be ruined.
 
-This system does exactly that:
-- A **Technician** records the temperature of a room.
-- If the temperature is outside the safe range, an **Alert** is automatically raised.
-- A **Supervisor** monitors all rooms and alerts on a live dashboard.
-- The Technician can **explain why** the temperature went out of range (File a Reason).
-- The Supervisor can **resolve or delete** the alert once the problem is fixed.
-- Every action is **logged to the database** so there is a full audit trail.
+This system resolves this challenge by providing:
+- **Technicians** who can monitor and record room temperatures.
+- **Automated Alerts** that trigger if temperature ranges are violated.
+- **Supervisors** who track alerts and manage resolution workflows.
+- **Admins** who exclusively handle system user accounts.
+- **Audit Trails** where every single action is safely logged to the database for compliance.
 
 ---
 
 ## 2. Technologies Used & Why
 
-### 2.1 ASP.NET Core (C#) — The Backend Framework
-**What it is:** A free, open-source framework made by Microsoft for building web APIs (Application Programming Interfaces).
+For someone new to .NET and modern web development, here is a simple breakdown of every technology used in this project and why we selected it.
 
-**Why it is used:** It is fast, reliable, and very popular in enterprise applications. It handles HTTP requests from the browser and returns data in JSON format. It also has built-in support for authentication, logging, and database access.
+### 2.1 ASP.NET Core (C#) — The Backend Web API Framework
+*   **What it is:** A fast, lightweight, and cross-platform framework created by Microsoft to build web applications and APIs.
+*   **Why we use it:** It's built for speed and security. It listens for requests from the frontend, communicates with the databases, and sends back structured responses in JSON format.
+*   **Where it is used:** Every backend microservice (User, Room, Temperature, Alert, and Authentication) is built as an independent ASP.NET Core Web API.
 
-**Where it is used:** In all 5 backend services — UserViewerAPI, RoomViewerAPI, TemperatureViewerAPI, AlarmLogViewerAPI, and AuthenticationWebApi.
+### 2.2 Entity Framework Core (EF Core) — The Database Connector
+*   **What it is:** An Object-Relational Mapper (ORM) that lets developers write database code using C# classes instead of raw SQL queries.
+*   **Why we use it:** Instead of writing complex SQL commands like `INSERT INTO Alerts (RoomId, Temperature) VALUES ('R101', 45)`, you write `await context.Alerts.AddAsync(newAlert)`. EF Core automatically generates and executes the database SQL for you.
+*   **Code-First Approach:** We write C# classes representing our tables (called "Models") and EF Core automatically builds the SQL databases and tables for us using:
+    *   `Add-Migration <Name>`: Creates the schema scripts.
+    *   `Update-Database`: Applies the changes to the physical SQL database.
+*   **Where it is used:** Configured inside the individual Class Libraries: `UserLibrary`, `RoomsLibrary`, `TemperatureLibrary`, and `AlertsLibrary`.
 
----
+### 2.3 SQL Server Express — The Database Engine
+*   **What it is:** A reliable, free, and lightweight edition of Microsoft's flagship SQL Server relational database.
+*   **Why we use it:** It integrates natively with .NET core and Entity Framework, offering high performance, transactions, and robust data storage.
+*   **Microservice Database Separation:** To follow best practices, each microservice has its **own separate database** to prevent cross-database locks or shared failures:
+    *   `PrjUsersDB` (User accounts)
+    *   `PrjRoomsDB` (Room boundaries)
+    *   `PrjTemperatureDB` (History of temperature logs)
+    *   `PrjAlertsLogDB` (Alerts and audit activity records)
 
-### 2.2 Entity Framework Core (EF Core) — The Database Tool
-**What it is:** A tool that lets you work with databases using C# code instead of writing raw SQL queries.
+### 2.4 JSON Web Tokens (JWT) — The Secure Digital Passport
+*   **What it is:** A secure, compact, and URL-safe string containing verified user claims (like user ID, username, and role).
+*   **Why we use it:** Once a user logs in, the backend signs a JWT with a secret key and gives it to the browser. The frontend attaches this token to every subsequent request in the `Authorization: Bearer <Token>` header. The server verifies this token mathematically, instantly knowing who is calling the API and whether they are authorized.
+*   **Where it is used:** Generated in `AuthenticationWebApi` and verified in all other API controllers using `[Authorize]`.
 
-**Why it is used:** Instead of writing `INSERT INTO Alerts VALUES (...)`, you simply write `context.Alerts.AddAsync(alert)`. EF Core translates this into SQL automatically. This is called the **Code First** approach — you write C# classes (called "models") and EF Core creates the database tables for you.
+### 2.5 Ocelot — The API Gateway (Entry Point)
+*   **What it is:** A powerful .NET library that acts as a single, unified entry point (Gateway) for all backend APIs.
+*   **Why we use it:** In a microservices system, each API runs on a different port. Without a gateway, the frontend would have to constantly call different ports. With Ocelot, the frontend makes **all** requests to port `5065`, and Ocelot routes the requests internally.
+*   **Where it is used:** Configured inside the `AlarmLogViewerApiGateway` microservice.
 
-**Where it is used:** In all 4 class libraries — AlertsLibrary, RoomsLibrary, TemperatureLibrary, UserLibrary.
+### 2.6 React.js (JavaScript) — The Frontend Dashboard
+*   **What it is:** A popular JavaScript library developed by Meta (Facebook) for building fast, component-based user interfaces.
+*   **Why we use it:** It utilizes a virtual DOM, meaning it only updates the specific parts of the page that change. For example, if a room triggers an alert, React updates that room card dynamically without reloading the whole browser.
+*   **Where it is used:** Located entirely inside the `Frontend` folder.
 
-**Key EF Core command used:**
-- `Add-Migration` — Creates a script describing database changes.
-- `Update-Database` — Applies those changes to the actual SQL Server database.
+### 2.7 Vite — The Speed-Driven Development Tool
+*   **What it is:** A modern, incredibly fast build tool and dev server designed for frontend web apps.
+*   **Why we use it:** It bundle-compiles React pages instantly and provides hot-module-reloading (changes are reflected in the browser the moment you save the file).
 
----
-
-### 2.3 SQL Server Express — The Database
-**What it is:** A free version of Microsoft SQL Server. A database is like a spreadsheet that your application can read and write to very quickly.
-
-**Why it is used:** SQL Server is reliable, widely used in .NET applications, and integrates perfectly with EF Core.
-
-**Where it is used:** There are **4 separate databases**, one for each microservice:
-- `PrjUsersDB` — Stores users
-- `PrjRoomsDB` — Stores rooms
-- `PrjTemperatureDB` — Stores temperature readings
-- `PrjAlertsLogDB` — Stores alerts, activity logs
-
----
-
-### 2.4 JWT (JSON Web Token) — Authentication
-**What it is:** A small, encoded string (like a digital passport) that proves who you are. Once you log in, the server gives you a JWT token. Every time you make a request, you send this token along with it.
-
-**Why it is used:** Without JWT, anyone could call the APIs without logging in. JWT ensures that only authenticated users (Technicians and Supervisors) can access the system.
-
-**Where it is used:** Generated in `AuthenticationWebApi`. Sent by `authService.js`. Attached to every API call in `apiService.js`.
-
-**Format:** `Bearer eyJhbGciOiJIUzI1NiJ9.eyJuYW...`
-
----
-
-### 2.5 Ocelot — The API Gateway
-**What it is:** A .NET library that acts as a single front door for all backend services. Instead of the browser calling 5 different ports, it calls ONE port (5065) and Ocelot forwards the request to the correct service.
-
-**Why it is used:** Simplifies the frontend — it only needs to know one URL. Also good for security and scalability.
-
-**Where it is used:** `AlarmLogViewerApiGateway` project, configured in `Ocelot.json`.
-
----
-
-### 2.6 React (JavaScript) — The Frontend Framework
-**What it is:** A JavaScript library made by Meta (Facebook) for building interactive user interfaces.
-
-**Why it is used:** React makes it easy to build dynamic, real-time dashboards. When data changes (e.g. a new alert comes in), React automatically updates only the part of the page that changed — without refreshing the entire page.
-
-**Where it is used:** All files inside the `Frontend/src/` folder.
-
----
-
-### 2.7 Vite — The Frontend Build Tool
-**What it is:** A fast development server and build tool for React applications.
-
-**Why it is used:** It starts the development server very fast and provides instant hot-reloading (when you save a file, the browser updates immediately).
-
-**Where it is used:** `Frontend/` folder. Run with `npm run dev`.
-
----
-
-### 2.8 React Router — Page Navigation
-**What it is:** A library that handles navigation in a React app without reloading the page.
-
-**Why it is used:** Allows navigating between Login, Register, and Dashboard pages smoothly.
-
-**Where it is used:** `App.jsx` — defines routes for `/login`, `/register`, `/dashboard`.
-
----
-
-### 2.9 ILogger — Built-in .NET Logging
-**What it is:** A built-in interface in ASP.NET Core for writing log messages. These messages appear in the Visual Studio Output window while the app is running.
-
-**Why it is used:** Helps developers see exactly what is happening in real time — which API was called, what data was received, and if any errors occurred.
-
-**Where it is used:** `AlertController.cs`, `RoomController.cs`, `TemperatureController.cs`.
-
----
-
-### 2.10 CSS (Vanilla) — Styling
-**What it is:** Cascading Style Sheets — used to style the HTML elements (colours, fonts, spacing, animations).
-
-**Where it is used:** `Dashboards.css`, `App.css`, `index.css` in the Frontend.
+### 2.8 Tailwind CSS & Custom Layouts — Premium Styling
+*   **What it is:** Fully responsive, modern Cascading Style Sheets (CSS) styled custom files.
+*   **Why we use it:** We styled the UI with polished glassmorphism layouts, live pulse animations (blinking red status badges), cohesive dark themes, and dynamic buttons to make it feel premium.
+*   **Where it is used:** Rendered via `Frontend/src/components/Dashboards.css`.
 
 ---
 
 ## 3. Project Architecture — The Big Picture
 
-This project uses a **Microservices Architecture**. This means instead of one big application, the system is split into several small, independent services. Each service does ONE job and has its own database.
+This system is built using a **Microservices Architecture**. Instead of one monolithic code file, the backend is split into 5 small, lightweight microservices. Each microservice has its own isolated responsibility and its own dedicated database.
 
 ```
-BROWSER (React Frontend)
-        |
-        | (HTTP requests to port 5065)
-        v
-API GATEWAY (Ocelot) — port 5065
-        |
-        |--- /userSvc      --> UserViewerAPI        (port 5025)
-        |--- /roomSvc      --> RoomViewerAPI        (port 5286)
-        |--- /temperatureSvc --> TemperatureViewerAPI (port 5155)
-        |--- /alertSvc     --> AlarmLogViewerAPI    (port 5179)
-        |--- /authSvc      --> AuthenticationWebApi  (port 5228)
-```
+                  ┌───────────────────────────────┐
+                  │   React Browser UI (Port 5173)│
+                  └───────────────┬───────────────┘
+                                  │
+                       (HTTP Port 5065 Requests)
+                                  ▼
+                  ┌───────────────────────────────┐
+                  │    Ocelot Gateway (Port 5065) │
+                  └───────────────┬───────────────┘
+                                  │
+      ┌───────────────────────────┼───────────────────────────┐
+      ▼                           ▼                           ▼
+┌──────────────┐            ┌──────────────┐            ┌──────────────┐
+│ Authentication│            │  User API    │            │  Room API    │
+│  (Port 5228) │            │ (Port 5025)  │            │ (Port 5286)  │
+└──────────────┘            └──────┬───────┘            └──────┬───────┘
+                                   ▼                           ▼
+                            ┌──────────────┐            ┌──────────────┐
+                            │  PrjUsersDB  │            │  PrjRoomsDB  │
+                            └──────────────┘            └──────────────┘
 
-Each API service has its own Class Library (the data layer):
-
-```
-UserViewerAPI       <--> UserLibrary       <--> PrjUsersDB
-RoomViewerAPI       <--> RoomsLibrary      <--> PrjRoomsDB
-TemperatureViewerAPI <--> TemperatureLibrary <--> PrjTemperatureDB
-AlarmLogViewerAPI   <--> AlertsLibrary     <--> PrjAlertsLogDB
+      ┌───────────────────────────┼───────────────────────────┐
+      ▼                                                       ▼
+┌──────────────┐                                        ┌──────────────┐
+│  Temp API    │                                        │  Alert API   │
+│ (Port 5155)  │                                        │ (Port 5179)  │
+└──────┬───────┘                                        └──────┬───────┘
+       ▼                                                       ▼
+┌──────────────┐                                        ┌──────────────┐
+│PrjTemperature│                                        │ PrjAlertsLog │
+└──────────────┘                                        └──────────────┘
 ```
 
 ---
 
 ## 4. How All Services Connect — Port Map
 
-| Service | Port | Purpose |
-|---|---|---|
-| React Frontend | 5173 | The UI the user sees in the browser |
-| API Gateway (Ocelot) | 5065 | Single entry point for all API calls |
-| UserViewerAPI | 5025 | Manage users (create, get, delete) |
-| RoomViewerAPI | 5286 | Manage rooms (create, edit, delete) |
-| TemperatureViewerAPI | 5155 | Record and fetch temperature readings |
-| AlarmLogViewerAPI | 5179 | Manage alerts, reasons, resolution notes, activity logs |
-| AuthenticationWebApi | 5228 | Generate JWT tokens for login |
+When running the project locally, the services communicate using local ports:
 
-**Important:** All 6 services must be running at the same time for the application to work.
+| Service Name | Port | Description / Responsibility |
+|:---|:---|:---|
+| **React Frontend** | `5173` | The web user interface rendered in the browser. |
+| **API Gateway (Ocelot)** | `5065` | The master gateway through which all frontend API calls flow. |
+| **AuthenticationWebApi** | `5228` | Generates secure JWT security passports upon credentials match. |
+| **UserViewerAPI** | `5025` | Handles user registration, credentials retrieval, and account listings. |
+| **RoomViewerAPI** | `5286` | Manages creation, retrieval, updates, and deletion of rooms. |
+| **TemperatureViewerAPI**| `5155` | Records new temperature logs and retrieves histories. |
+| **AlarmLogViewerAPI** | `5179` | Manages alerts, resolution notes, and the audit ActivityLog table. |
 
 ---
 
 ## 5. User Roles & What They Can Do
 
-### Technician
-- View all rooms or only their own rooms
-- Create a new room (with min/max temperature range)
-- Edit a room they created
-- Delete a room they created
-- Record the current temperature for any room
-- File a reason when a room has an active alert (explain what caused it)
+To protect the system, users are segregated into three distinct roles:
 
-### Supervisor
-- View the real-time monitoring dashboard (auto-refreshes every 5 seconds)
-- See all rooms with their current temperature and alert status
-- See the technician's filed reason for each alert
-- Mark an alert as Resolved (with an optional resolution note)
-- Delete an alert permanently
-- Manage users (view, delete)
+### 5.1 Technician
+*   **Create Rooms:** Can register rooms and set their safe temperature margins (`MinTemp` and `MaxTemp`).
+*   **Record Temperatures:** Can log the current temperature of any room in the facility.
+*   **File Reasons:** If a room triggers an alert, the technician can select a reason from a dropdown (e.g., "Equipment Malfunction", "Door Left Open") to explain why the anomaly happened.
+*   **Delete/Edit Rooms:** Can modify or delete rooms **only if they created them** (technicians cannot tamper with rooms created by other technicians).
+
+### 5.2 Supervisor
+*   **Live Monitoring Dashboard:** Can view a real-time table of all rooms, current temperatures, and active alert statuses (auto-refreshes every 5 seconds).
+*   **Resolution Workflow:** Can select a blinking active alert, click **Mark Resolved**, and document the fix in an optional text field (e.g., "Reset the thermostat, unit normal").
+*   **Delete Alerts:** Can permanently delete resolved or stale alerts to clean up dashboard listings.
+*   **Read-Only User View:** Can navigate to the "Users" tab to see all active user accounts, but has **no deletion or administrative rights** over those accounts.
+
+### 5.3 Admin
+*   **Exclusive User Administration:** The Admin has a highly-restricted interface focused purely on user auditing and safety.
+*   **Delete Users:** The Admin is the **only role** that can delete user accounts (Supervisors and Technicians cannot access this).
+*   **No Access to Operations:** To enforce separation of duties, the Admin cannot register rooms, set temperatures, file reasons, or resolve alerts.
 
 ---
 
 ## 6. Database Design — All Tables Explained
 
-### PrjUsersDB → Table: Users
-| Column | Type | Description |
-|---|---|---|
-| UserId | VARCHAR(6) | Primary Key e.g. U12345 |
-| Username | VARCHAR(100) | User's email address |
-| Password | VARCHAR(100) | Password (stored as plain text) |
-| Role | VARCHAR(30) | "Technician" or "Supervisor" |
-| CreatedAt | VARCHAR(30) | Date the account was created |
+We use Microsoft SQL Server to store our records. Below is an easy-to-read schema guide:
+
+### 6.1 `PrjUsersDB` → Table: `Users`
+Stores account profiles.
+*   `UserId` (VARCHAR, 6): Unique identifier (e.g., `U12345`). Primary Key.
+*   `Username` (VARCHAR, 100): Email address of the user.
+*   `Password` (VARCHAR, 100): User's password.
+*   `Role` (VARCHAR, 30): The user's role ("Technician", "Supervisor", "Admin").
+*   `CreatedAt` (VARCHAR, 30): Timestamp of registration.
+
+### 6.2 `PrjRoomsDB` → Table: `Rooms`
+Defines monitored areas and safe temperature thresholds.
+*   `RoomId` (VARCHAR, 6): Unique room code (e.g., `R54321`). Primary Key.
+*   `RoomName` (VARCHAR, 100): Clear name of the room (e.g., "Vaccine Cold Storage").
+*   `MinTemp` (DECIMAL): Lowest safe temperature boundary.
+*   `MaxTemp` (DECIMAL): Highest safe temperature boundary.
+*   `CreatedByUserId` (VARCHAR, 6): The ID of the technician who created the room.
+*   `CreatedAt` (VARCHAR, 30): Timestamp of room registration.
+
+### 6.3 `PrjTemperatureDB` → Table: `Temperatures`
+Tracks a historical audit trail of every temperature log.
+*   `ReadingId` (VARCHAR, 6): Unique reading code. Primary Key.
+*   `RoomId` (VARCHAR, 6): The room being measured.
+*   `TemperatureValue` (DECIMAL): Recorded temperature value.
+*   `RecordedAt` (DateTime): The exact date and time the reading was taken.
+
+### 6.4 `PrjAlertsLogDB` → Table: `Alerts`
+Logs safety violations and documentation on how they were handled.
+*   `AlertId` (VARCHAR, 6): Unique alert code. Primary Key.
+*   `RoomId` (VARCHAR, 6): The room violating safe limits.
+*   `Temperature` (DECIMAL): The out-of-range temperature that triggered the alert.
+*   `Status` (VARCHAR, 30): Anomaly state ("Too Hot", "Too Cold", or "Resolved").
+*   `AlertTime` (VARCHAR, 30): When the violation happened.
+*   `Reason` (VARCHAR, 200): Technician's reason documentation (nullable).
+*   `ResolutionNote` (VARCHAR, 500): Supervisor's optional resolution notes (nullable).
+
+### 6.5 `PrjAlertsLogDB` → Table: `ActivityLogs`
+Provides an tamper-proof system audit log.
+*   `LogId` (INT): Auto-incrementing record ID. Primary Key.
+*   `Action` (VARCHAR, 100): The system action name (e.g., "Alert Created").
+*   `Details` (VARCHAR, 500): Details of the action (e.g., "Alert A98765 marked Resolved by Supervisor S12345 with note...").
+*   `Timestamp` (DateTime): Date and time of the logging event.
 
 ---
 
-### PrjRoomsDB → Table: Rooms
-| Column | Type | Description |
-|---|---|---|
-| RoomId | VARCHAR(6) | Primary Key e.g. R12345 |
-| RoomName | VARCHAR(100) | Name of the room |
-| MinTemp | DECIMAL | Minimum safe temperature (°C) |
-| MaxTemp | DECIMAL | Maximum safe temperature (°C) |
-| CreatedByUserId | VARCHAR(6) | Which technician created this room |
-| CreatedAt | VARCHAR(30) | Date the room was created |
+## 7. Backend Services & Custom Controllers
 
----
+Each backend service is isolated, but let's focus on the most important controllers to see how they handle inputs and control flow.
 
-### PrjTemperatureDB → Table: Temperatures
-| Column | Type | Description |
-|---|---|---|
-| ReadingId | VARCHAR(6) | Primary Key |
-| RoomId | VARCHAR(6) | Which room this reading belongs to |
-| TemperatureValue | DECIMAL | The recorded temperature in °C |
-| RecordedAt | DateTime | When this reading was taken |
-
----
-
-### PrjAlertsLogDB → Table: Alerts
-| Column | Type | Description |
-|---|---|---|
-| AlertId | VARCHAR(6) | Primary Key |
-| RoomId | VARCHAR(6) | Which room triggered the alert |
-| Temperature | DECIMAL | The temperature that caused the alert |
-| Status | VARCHAR(30) | "Too Hot", "Too Cold", or "Resolved" |
-| AlertTime | VARCHAR(30) | When the alert was triggered |
-| Reason | VARCHAR(200) | Reason filed by the technician (optional) |
-| ResolutionNote | VARCHAR(500) | Resolution note written by supervisor (optional) |
-
----
-
-### PrjAlertsLogDB → Table: ActivityLogs
-| Column | Type | Description |
-|---|---|---|
-| LogId | INT (auto) | Auto-incremented Primary Key |
-| Action | VARCHAR(100) | Short name e.g. "Alert Created" |
-| Details | VARCHAR(500) | Full description of what happened |
-| Timestamp | DateTime | Exact date and time of the action |
-
----
-
-## 7. Backend Services — Explained One by One
-
-### 7.1 UserViewerAPI (Port 5025)
-Manages user accounts. Uses `UserLibrary` and `PrjUsersDB`.
-
-**Endpoints:**
-| Method | URL | What it does |
-|---|---|---|
-| GET | /api/User | Get all users |
-| GET | /api/User/{id} | Get one user by ID |
-| GET | /api/User/credentials?username=&password= | Verify login credentials |
-| POST | /api/User | Create a new user (Register) |
-| PUT | /api/User/{id} | Update user details |
-| DELETE | /api/User/{id} | Delete a user |
-
----
-
-### 7.2 RoomViewerAPI (Port 5286)
-Manages rooms. Uses `RoomsLibrary` and `PrjRoomsDB`.
-
-**Special behaviour on room creation:** When a new room is created, the Room API automatically calls BOTH the Temperature API and the Alert API to create a matching "stub" record. This ensures all 3 databases stay in sync.
-
-**Endpoints:**
-| Method | URL | What it does |
-|---|---|---|
-| GET | /api/Room | Get all rooms |
-| GET | /api/Room/{id} | Get one room |
-| GET | /api/Room/creator/{userId} | Get rooms created by a specific user |
-| POST | /api/Room | Create a new room |
-| PUT | /api/Room/{id} | Edit a room |
-| DELETE | /api/Room/{id} | Delete a room |
-
----
-
-### 7.3 TemperatureViewerAPI (Port 5155)
-Records and retrieves temperature readings. Uses `TemperatureLibrary` and `PrjTemperatureDB`.
-
-**Endpoints:**
-| Method | URL | What it does |
-|---|---|---|
-| GET | /api/Temperature | Get all readings |
-| GET | /api/Temperature/{id} | Get one reading |
-| GET | /api/Temperature/room/{roomId} | Get all readings for a room |
-| GET | /api/Temperature/room/{roomId}/latest | Get the most recent reading |
-| POST | /api/Temperature | Record a new temperature |
-| PUT | /api/Temperature/{id} | Update a reading |
-| DELETE | /api/Temperature/{id} | Delete a reading |
-
----
-
-### 7.4 AlarmLogViewerAPI (Port 5179)
-The most important service. Manages alerts, activity logs. Uses `AlertsLibrary` and `PrjAlertsLogDB`.
-
-**Endpoints:**
-| Method | URL | What it does |
-|---|---|---|
-| GET | /api/Alert | Get all alerts |
-| GET | /api/Alert/{id} | Get one alert |
-| GET | /api/Alert/room/{roomId} | Get all alerts for a room |
-| GET | /api/Alert/status/{status} | Get alerts by status |
-| GET | /api/Alert/logs | Get all activity logs |
-| POST | /api/Alert | Create a new alert |
-| PUT | /api/Alert/{id} | Update alert (file reason / mark resolved) |
-| DELETE | /api/Alert/{id} | Delete an alert |
-
----
-
-### 7.5 AuthenticationWebApi (Port 5228)
-Generates JWT tokens. Has no database.
-
-**Endpoint:**
-| Method | URL | What it does |
-|---|---|---|
-| GET | /api/Auth/{userName}/{role}/{secretKey} | Returns a signed JWT token |
-
----
-
-## 8. The API Gateway — The Traffic Controller
-
-The API Gateway uses a library called **Ocelot**. Its configuration is in `Ocelot.json`.
-
-**How it works (example):**
-1. Browser calls: `GET http://localhost:5065/roomSvc/R12345`
-2. Ocelot sees `/roomSvc/` → maps it to port 5286
-3. Ocelot forwards: `GET http://localhost:5286/api/Room/R12345`
-4. RoomViewerAPI responds with the room data
-5. Ocelot sends the response back to the browser
-
-**Route Mappings in Ocelot.json:**
-| Frontend URL | Forwarded To |
-|---|---|
-| /userSvc/... | localhost:5025/api/User/... |
-| /roomSvc/... | localhost:5286/api/Room/... |
-| /temperatureSvc/... | localhost:5155/api/Temperature/... |
-| /alertSvc/... | localhost:5179/api/Alert/... |
-| /authSvc/... | localhost:5228/api/Auth/... |
-
----
-
-## 9. Authentication — How Login Works
-
-This is a step-by-step explanation of what happens when someone logs in:
-
-**Step 1 — User enters email and password and clicks Login.**
-
-**Step 2 — `authService.js` calls `/userSvc/credentials`**
-- This hits the User API which checks if the email and password match a record in `PrjUsersDB`.
-- If wrong credentials → returns an error → user sees "Invalid email or password."
-- If correct → returns the user object (userId, username, role).
-
-**Step 3 — `authService.js` calls `/authSvc/{username}/{role}/{secretKey}`**
-- This hits the Auth API.
-- The Auth API creates a JWT token containing the user's name and role (Technician or Supervisor).
-- The token is signed with a secret key using the **HMAC SHA-256** algorithm.
-- The token expires after **2 hours**.
-
-**Step 4 — Token is stored in `localStorage`.**
-- `localStorage.setItem('token', token)` — saved in the browser.
-- `localStorage.setItem('user', JSON.stringify(userData))` — user info also saved.
-
-**Step 5 — Every future API call includes the token.**
-- In `apiService.js`, the `fetchWithAuth` function reads the token from localStorage and adds it to the `Authorization` header: `Bearer <token>`.
-- The API Gateway passes it through, and each API controller validates it via `[Authorize]`.
-
-**Step 6 — On logout, the token is removed.**
-- `authService.logout()` calls `localStorage.removeItem('token')`.
-
----
-
-## 10. Frontend — How the UI Works
-
-### File Structure
-```
-Frontend/src/
-├── App.jsx              — Defines routes (Login, Register, Dashboard)
-├── main.jsx             — Entry point, renders the React app
-├── pages/
-│   ├── Login.jsx        — Login form
-│   ├── Register.jsx     — Registration form
-│   └── Dashboard.jsx    — Decides which dashboard to show (Technician or Supervisor)
-├── components/
-│   ├── TechnicianDashboard.jsx  — Technician's room management + temperature recording
-│   ├── SupervisorDashboard.jsx  — Supervisor's live monitoring + user management
-│   └── ProtectedRoute.jsx       — Blocks access to dashboard if not logged in
-├── services/
-│   ├── authService.js   — Login, Register, Logout, token management
-│   └── apiService.js    — All API calls (rooms, alerts, temperatures, users)
-├── context/
-│   └── AuthContext.jsx  — Shares login state across the whole app
-└── components/
-    └── Dashboards.css   — All CSS styling for both dashboards
-```
-
-### How the Dashboard decides which view to show
-In `Dashboard.jsx`, it reads the user's role from localStorage:
-- If role === "Supervisor" → renders `<SupervisorDashboard />`
-- If role === "Technician" → renders `<TechnicianDashboard />`
-
-### Auto-Refresh (Polling)
-Both dashboards use `setInterval` to automatically re-fetch data every **5 seconds**:
-```js
-const interval = setInterval(() => {
-    fetchData(); // or fetchAllData() in Supervisor
-}, 5000);
-return () => clearInterval(interval); // Cleanup on unmount
-```
-
----
-
-## 11. Complete Request Flow — Step by Step
-
-### Example: Technician records a temperature of 45°C for a room with max 35°C
-
-**Step 1:** Technician clicks "Set Temp", enters 45, clicks "Record Reading".
-
-**Step 2:** `TechnicianDashboard.jsx` calls `handleSetTemperature()`.
-
-**Step 3:** It calls `apiService.setTemperature(...)` which sends:
-```
-POST http://localhost:5065/temperatureSvc
-Body: { readingId: "T12345", roomId: "R11111", temperatureValue: 45, recordedAt: "..." }
-```
-
-**Step 4:** Ocelot forwards this to TemperatureViewerAPI (port 5155).
-
-**Step 5:** TemperatureViewerAPI saves the reading to `PrjTemperatureDB` and logs to console via ILogger.
-
-**Step 6:** Back in `handleSetTemperature()`, the code compares 45°C to the room's max (35°C).
-Since 45 > 35, status = "Too Hot".
-
-**Step 7:** It calls `apiService.createAlert(...)` which sends:
-```
-POST http://localhost:5065/alertSvc
-Body: { alertId: "A12345", roomId: "R11111", temperature: 45, status: "Too Hot", alertTime: "..." }
-```
-
-**Step 8:** Ocelot forwards to AlarmLogViewerAPI (port 5179).
-
-**Step 9:** AlertController saves the alert to `PrjAlertsLogDB`.
-It also logs to console (ILogger) AND saves an ActivityLog record to the database.
-
-**Step 10:** The Supervisor's dashboard (polling every 5 seconds) fetches alerts and now sees the new "Too Hot" alert on Room R11111. The room card turns red and shows a blinking ALERT indicator.
-
----
-
-## 12. ILogger & Activity Logs
-
-### ILogger (Console Logging)
-ILogger is built into ASP.NET Core. You just inject it and use it:
+### 7.1 `UserController`
+Manages user listings, registration, credentials verification, and account deletions.
 ```csharp
-private readonly ILogger<AlertController> _logger;
-// Then in a method:
-_logger.LogInformation("Alert created: {AlertId}", alert.AlertId);
-_logger.LogError("Failed to save: {Error}", ex.Message);
-```
-These messages appear in the Visual Studio Output window when the app runs.
+[Route("api/[controller]")]
+[ApiController]
+public class UserController : ControllerBase
+{
+    private readonly IUserRepository userRepo;
+    public UserController(IUserRepository userRepository) { userRepo = userRepository; }
 
-**Where ILogger is used:**
-- `AlertController.cs` — logs every alert action
-- `RoomController.cs` — logs room create, update, delete
-- `TemperatureController.cs` — logs temperature record and update
+    [HttpGet]
+    public async Task<ActionResult> GetAll() { ... }
 
-### Database Activity Logs
-For a permanent record, all alert-related actions are also saved to the `ActivityLogs` table in `PrjAlertsLogDB`.
-
-**Actions that are logged to the database:**
-| Action | Triggered By |
-|---|---|
-| Alert Created | Technician records out-of-range temperature |
-| Reason Filed by Technician | Technician submits a reason for the alert |
-| Alert Resolved by Supervisor | Supervisor clicks "Mark Resolved" and submits |
-| Alert Deleted by Supervisor | Supervisor clicks "Delete Alert" and confirms |
-
----
-
-## 13. Alert Lifecycle — From Trigger to Resolution
-
-```
-TEMPERATURE RECORDED (by Technician)
-        |
-        v
-Is temperature outside min/max range?
-        |
-   YES  |   NO
-        |    └── Nothing happens. Room stays normal (green).
-        v
-ALERT CREATED (status: "Too Hot" or "Too Cold")
-        |
-        v
-Supervisor sees blinking ALERT on room card
-        |
-        v
-Technician can FILE A REASON
-(selects from dropdown: Equipment malfunction, Power outage, etc.)
-        |
-        v
-Supervisor sees the filed reason on the alert card
-        |
-        v
-Supervisor clicks "Mark Resolved"
-        |
-        v
-Popup appears — Supervisor writes optional resolution note
-(e.g. "AC filter was cleaned and unit restarted")
-        |
-        v
-Alert status updated to "Resolved"
-Room card goes back to normal (green)
-ActivityLog record saved to database
-        |
-     OR v
-Supervisor clicks "Delete Alert" → Alert permanently removed
-ActivityLog record saved to database
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")] // Restricts execution purely to logged-in Admins
+    public async Task<ActionResult> Delete(string id)
+    {
+        try
+        {
+            await userRepo.DeleteAsync(id);
+            return Ok("User deleted successfully");
+        }
+        catch (UserException ex) { return NotFound(ex.Message); }
+    }
+}
 ```
 
----
+### 7.2 `RoomController`
+Handles room registration and updates. When a room is successfully registered, the RoomController communicates synchronously via `HttpClient` to the Temperature and Alert microservices to create "stub" records, ensuring database sync.
 
-## 14. Validation & Error Handling
-
-### Frontend Validation
-- **Min/Max Temperature Check:** When creating or editing a room, if `maxTemp <= minTemp`, the form shows an error inside the modal and does NOT call the API.
-- **Required Fields:** Room name and temperature value are required fields (HTML `required` attribute).
-- **Empty Auth Check:** `apiService.js` checks if a JWT token exists before every call. If missing, it throws an error immediately without hitting the server.
-
-### Backend Error Handling
-Each repository method throws a custom exception when something goes wrong:
-- `AlertException` — thrown by AlertsLibrary
-- `RoomException` — thrown by RoomsLibrary
-- `TemperatureException` — thrown by TemperatureLibrary
-
-Each controller catches these exceptions and returns the appropriate HTTP status code:
-- `200 OK` — Success
-- `201 Created` — New record created
-- `400 Bad Request` — Invalid data
-- `404 Not Found` — Record doesn't exist
-
-**Graceful degradation:** `GetByRoom` endpoints in both Temperature and Alert controllers catch exceptions and return an empty list `[]` instead of a 500 error. This prevents the frontend from crashing when a new room has no data yet.
+### 7.3 `AlertController`
+Responsible for alert orchestration, reason submissions, supervisor resolutions, and saving audit trail logs to `ActivityLogs`.
 
 ---
 
-## 15. Key Files Reference
+## 8. Role-Based Security & Authorization (Admin Protection)
 
-| File | Location | Purpose |
-|---|---|---|
-| `Alert.cs` | AlertsLibrary/Models | Database model for alerts (with Reason, ResolutionNote) |
-| `ActivityLog.cs` | AlertsLibrary/Models | Database model for activity history |
-| `AlertDbContext.cs` | AlertsLibrary/Models | EF Core database context (registers all tables) |
-| `IAlertRepository.cs` | AlertsLibrary/Repos | Interface defining all available database operations |
-| `EFAlertRepository.cs` | AlertsLibrary/Repos | Actual implementation of database operations |
-| `AlertController.cs` | AlarmLogViewerAPI/Controllers | HTTP API endpoints for alerts + logging |
-| `RoomController.cs` | RoomViewerAPI/Controllers | HTTP API endpoints for rooms |
-| `TemperatureController.cs` | TemperatureViewerAPI/Controllers | HTTP API endpoints for temperatures |
-| `AuthController.cs` | AuthenticationWebApi/Controllers | Generates JWT tokens |
-| `Ocelot.json` | AlarmLogViewerApiGateway | Maps frontend URLs to backend services |
-| `apiService.js` | Frontend/src/services | All frontend API calls (with JWT token) |
-| `authService.js` | Frontend/src/services | Login, register, logout logic |
-| `TechnicianDashboard.jsx` | Frontend/src/components | Technician UI — rooms, temperatures, file reason |
-| `SupervisorDashboard.jsx` | Frontend/src/components | Supervisor UI — live monitoring, resolve, delete alerts |
-| `App.jsx` | Frontend/src | React routing (Login, Register, Dashboard pages) |
-| `Dashboards.css` | Frontend/src/components | All CSS styling for dashboards |
+### 8.1 How JWT Roles are Transmitted
+During login inside `AuthenticationWebApi`, the role of the user (e.g., `"Admin"`, `"Supervisor"`, or `"Technician"`) is embedded into the JWT token as a claim:
+```csharp
+Claim[] claims = new[] {
+    new Claim(ClaimTypes.Name, userName),
+    new Claim(ClaimTypes.Role, role) // Encodes the user's role
+};
+```
+When this signed token is evaluated by the other microservices, the security framework parses the role claim.
 
----
-
-## How to Run the Project
-
-You need to start **6 things** in this order:
-
-1. Start **SQL Server Express** (it usually starts automatically with Windows).
-2. Run **AuthenticationWebApi** (port 5228)
-3. Run **UserViewerAPI** (port 5025)
-4. Run **RoomViewerAPI** (port 5286)
-5. Run **TemperatureViewerAPI** (port 5155)
-6. Run **AlarmLogViewerAPI** (port 5179)
-7. Run **AlarmLogViewerApiGateway** (port 5065)
-8. In the Frontend folder, run: `npm run dev` (starts on port 5173)
-9. Open your browser and go to: `http://localhost:5173`
+### 8.2 Securing the User Deletion Endpoint
+To ensure a Supervisor or Technician cannot manually bypass the frontend and call `DELETE /api/User/U12345` using tools like Postman, the backend enforces a role constraint at the controller level:
+```csharp
+[HttpDelete("{id}")]
+[Authorize(Roles = "Admin")]
+```
+If a request comes in containing a JWT with `role: "Supervisor"`, the .NET backend immediately cancels the request and sends back a `403 Forbidden` response.
 
 ---
 
-*Documentation generated for Alarm Log Viewer Using Microservices — May 2026*
+## 9. The API Gateway — Ocelot Configuration
+
+The API gateway acts as the single gateway for your application. It utilizes `Ocelot.json` to map frontend routes to internal downstream services:
+
+```json
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/User/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5025 }
+      ],
+      "UpstreamPathTemplate": "/userSvc/{everything}",
+      "UpstreamMethods": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Room/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5286 }
+      ],
+      "UpstreamPathTemplate": "/roomSvc/{everything}",
+      "UpstreamMethods": [ "Get", "Post", "Put", "Delete" ]
+    }
+  ]
+}
+```
+
+---
+
+## 10. Authentication & JWT Tokens — How Login Works
+
+Here is a step-by-step trace of the login flow:
+
+```
+┌──────┐               ┌───────────┐            ┌──────────┐            ┌───────────┐
+│ User │               │  Browser  │            │ User API │            │  Auth API │
+└──┬───┘               └─────┬─────┘            └────┬─────┘            └─────┬─────┘
+   │                         │                       │                        │
+   │  Enters email/pwd       │                       │                        │
+   ├────────────────────────>│                       │                        │
+   │  Clicks Login           │                       │                        │
+   │                         │  POST /userSvc/cred   │                        │
+   │                         ├──────────────────────>│                        │
+   │                         │                       │  Validates record      │
+   │                         │                       ├──────────────┐         │
+   │                         │                       │ in DB        │         │
+   │                         │                       │              │         │
+   │                         │  Returns User profile │◄─────────────┘         │
+   │                         │◄──────────────────────┤                        │
+   │                         │                       │                        │
+   │                         │  GET /authSvc/{role}                           │
+   │                         ├───────────────────────────────────────────────>│
+   │                         │                                                │  Signs JWT
+   │                         │                                                │  with Key
+   │                         │                                                ├────────┐
+   │                         │                                                │        │
+   │                         │  Returns JWT token string                      │◄───────┘
+   │                         │◄───────────────────────────────────────────────┤
+   │                         │
+   │                         │ Saves to localStorage
+   │                         ├──────────────┐
+   │                         │              │
+   │                         │              │
+   │                         │◄─────────────┘
+   │                         │
+   │  Redirects to Dashboard │
+   │◄────────────────────────┤
+```
+
+---
+
+## 11. Frontend — How the UI Works
+
+The frontend React application coordinates state management and UI styling.
+
+### 11.1 Route Guards
+We use a `<ProtectedRoute />` component that checks if a JWT token exists in `localStorage`. If there's no valid token, it immediately redirects the visitor back to `/login`.
+
+### 11.2 Dashboard Redirection
+Inside `Dashboard.jsx`, the system inspects the logged-in user's role to determine the user experience:
+```javascript
+const role = user?.role;
+
+return (
+    <main className="dashboard-content">
+        {role === 'Admin' ? (
+            <AdminDashboard />
+        ) : role === 'Supervisor' ? (
+            <SupervisorDashboard />
+        ) : (
+            <TechnicianDashboard userId={user?.userId} />
+        )}
+    </main>
+);
+```
+
+### 11.3 Polling (Real-time auto-refresh)
+Dashboards utilize a React `useEffect` hook to regularly request updated state info:
+```javascript
+useEffect(() => {
+    fetchAllData();
+    const interval = setInterval(() => {
+        fetchAllData();
+    }, 5000); // Triggers updates every 5 seconds
+    return () => clearInterval(interval);
+}, []);
+```
+
+---
+
+## 12. Complete Request Flow — Step by Step
+
+Let's trace what happens when a **Technician logs a high temperature**:
+
+1.  **Technician Action:** The technician clicks "Record Temp" on the **"Vaccine Freezer" Room Card** (safe limits: `-20°C` to `-10°C`), enters `-5°C`, and saves.
+2.  **Frontend Range Validation:** The frontend compares `-5` to the maximum limit of `-10`. Since `-5 > -10`, it registers a `"Too Hot"` alert situation.
+3.  **Log Temperature:** The frontend triggers `apiService.setTemperature()` which routes to `http://localhost:5065/temperatureSvc` (routed to the Temperature microservice).
+4.  **Create Alert:** The frontend immediately triggers `apiService.createAlert({ status: "Too Hot", temperature: -5 })` which routes to the Alert microservice (Port 5179).
+5.  **Database Logging:** The Alert microservice writes the alert record to the database and calls `LogActivityAsync` which creates an audit trail entry in the `ActivityLogs` table.
+6.  **Supervisor Interface Update:** The Supervisor's web browser fetches the active alerts 5 seconds later. The "Vaccine Freezer" Room Card instantly flashes **red**, showing a blinking **ALERT** banner with the active warning.
+
+---
+
+## 13. Logging Systems
+
+We use two distinct types of logging systems:
+
+### 13.1 Developer Logs (Console Logging via `ILogger`)
+Standard .NET output logging.
+```csharp
+_logger.LogInformation("Creating alert for Room {RoomId} with Temp {Temp}", alert.RoomId, alert.Temperature);
+```
+*Purpose:* Helps programmers trace application events in real time inside the Visual Studio console or terminal logs.
+
+### 13.2 Compliance Audit Logs (Persistent Database Logging)
+Permanent log records saved to the database. Whenever a critical alert state changes (creation, technician explanation, supervisor resolution, or alert deletion), a custom method is called:
+```csharp
+public async Task LogActivityAsync(string action, string details)
+{
+    var log = new ActivityLog {
+        Action = action,
+        Details = details,
+        Timestamp = DateTime.Now
+    };
+    await _context.ActivityLogs.AddAsync(log);
+    await _context.SaveChangesAsync();
+}
+```
+*Purpose:* Provides a durable, chronological history of operations for safety, audit compliance, and record-keeping.
+
+---
+
+## 14. Alert Lifecycle — From Trigger to Resolution
+
+Here is a visual representation of an alert's lifecycle:
+
+```
+   [Technician records unsafe Temperature]
+                     │
+                     ▼
+             ┌───────────────┐
+             │ ALERT CREATED │ (Status: "Too Hot" / "Too Cold")
+             └───────┬───────┘
+                     │
+                     ▼
+           (Supervisor sees Alert)
+                     │
+                     ├─────────────────────────────────────────┐
+                     ▼                                         ▼
+         (Technician Files Reason)                  (Supervisor acts directly)
+                     │                                         │
+                     ▼                                         ▼
+         ┌───────────────────────┐                    ┌──────────────────┐
+         │ REASON ADDED TO ALERT │                    │  MARK RESOLVED   │
+         └───────────┬───────────┘                    └────────┬─────────┘
+                     │                                         │
+                     └───────────────────┬─────────────────────┘
+                                         │
+                                         ▼
+                            (Resolution Modal opens)
+                                         │
+                                         ▼
+                          [Supervisor writes optional note]
+                                         │
+                                         ▼
+                             ┌──────────────────────┐
+                             │    ALERT RESOLVED    │ (Status: "Resolved")
+                             └──────────┬───────────┘
+                                         │
+                                         ▼
+                            (Room Card returns green)
+                            (Audit Log entry saved)
+```
+
+---
+
+## 15. Validation, Safety, & Error Handling
+
+To make the system robust, we built validation guardrails:
+
+1.  **Thermostat Safety Check:** When creating a room, the React frontend runs a comparison:
+    ```javascript
+    if (parseFloat(maxTemp) <= parseFloat(minTemp)) {
+        setError("Maximum temperature must be strictly greater than the minimum temperature.");
+        return;
+    }
+    ```
+    This prevents impossible safe zones (like `Min: 20°C, Max: 10°C`).
+2.  **Graceful Database Degradation:** If a newly created room has no recorded temperatures or active alerts, retrieving its state could crash standard database queries. We solved this by using `try-catch` structures inside the controllers to gracefully return empty arrays (`[]`) instead of throwing an error:
+    ```csharp
+    [HttpGet("room/{roomId}")]
+    public async Task<ActionResult> GetByRoom(string roomId)
+    {
+        try { return Ok(await alertRepo.GetByRoomAsync(roomId)); }
+        catch (AlertException) { return Ok(new List<Alert>()); } // Gracefully returns empty list
+    }
+    ```
+
+---
+
+## 16. Key Files Reference & Directory Map
+
+Here is your map to locate core operations:
+
+### 16.1 Backend C# Files
+*   `Alert.cs` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/AlertsLibrary/Models/Alert.cs)): Database model representing alerts.
+*   `AlertController.cs` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/AlarmLogViewerAPI/Controllers/AlertController.cs)): Alert endpoints, ILogger tracing, and database activity logs.
+*   `UsersController.cs` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/UserViewerAPI/Controllers/UsersController.cs)): User listings, registrations, and secure `[Authorize(Roles = "Admin")]` user deletion.
+*   `Ocelot.json` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/AlarmLogViewerApiGateway/Ocelot.json)): Upstream/Downstream port and route forwarding maps.
+
+### 16.2 Frontend React Files
+*   `AdminDashboard.jsx` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/Frontend/src/components/AdminDashboard.jsx)): The Admin's User Management dashboard.
+*   `SupervisorDashboard.jsx` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/Frontend/src/components/SupervisorDashboard.jsx)): The Supervisor's live room monitoring dashboard.
+*   `TechnicianDashboard.jsx` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/Frontend/src/components/TechnicianDashboard.jsx)): The Technician's room creator and temperature logger.
+*   `apiService.js` ([path](file:///c:/Users/HARSH/Downloads/AlarmLogViewerUsingMicroservices/Frontend/src/services/apiService.js)): The centralized API call center that automatically signs requests with the JWT security token.
+
+---
+
+## 17. How to Run the Complete Project
+
+Follow these steps to run the complete microservices project locally:
+
+1.  **Start SQL Server:** Make sure your SQL Server Express instance is running.
+2.  **Start Backend Services:** Open the solution in Visual Studio or use the terminal to run each project using `dotnet run`:
+    *   `AuthenticationWebApi` (Port 5228)
+    *   `UserViewerAPI` (Port 5025)
+    *   `RoomViewerAPI` (Port 5286)
+    *   `TemperatureViewerAPI` (Port 5155)
+    *   `AlarmLogViewerAPI` (Port 5179)
+    *   `AlarmLogViewerApiGateway` (Port 5065)
+3.  **Start React Client:** Open a terminal inside the `/Frontend` directory and start Vite:
+    ```bash
+    npm run dev
+    ```
+4.  **Log In:** Navigate to `http://localhost:5173`, register accounts with the roles you want to test, and explore!
+
+---
+
+*Documentation compiled with 💖 for Alarm Log Viewer — May 2026*
