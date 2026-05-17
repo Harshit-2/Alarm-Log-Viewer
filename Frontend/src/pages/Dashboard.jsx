@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import TechnicianDashboard from '../components/TechnicianDashboard';
 import SupervisorDashboard from '../components/SupervisorDashboard';
+import AdminDashboard from '../components/AdminDashboard';
 import './Auth.css';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
     
-    // We only have two roles: Technician and Supervisor
-    const isSupervisor = user?.role === 'Supervisor';
+    const role = user?.role;
 
     return (
         <div className="dashboard-container">
@@ -25,7 +25,9 @@ const Dashboard = () => {
             </nav>
 
             <main className="dashboard-content">
-                {isSupervisor ? (
+                {role === 'Admin' ? (
+                    <AdminDashboard />
+                ) : role === 'Supervisor' ? (
                     <SupervisorDashboard />
                 ) : (
                     <TechnicianDashboard userId={user?.userId} />

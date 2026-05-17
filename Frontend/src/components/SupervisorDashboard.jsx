@@ -119,18 +119,6 @@ const SupervisorDashboard = () => {
         a.status !== "Resolved" && rooms.some(r => r.roomId === a.roomId)
     );
 
-    const handleDeleteUser = async (userId) => {
-        if (!window.confirm('Are you sure you want to delete this user?')) return;
-        setDeleteError('');
-        try {
-            await apiService.deleteUser(userId);
-            fetchAllData(); // Refresh the list
-        } catch (err) {
-            // Show inline error instead of a browser alert popup
-            setDeleteError('Failed to delete user: ' + err.message);
-        }
-    };
-
     return (
         <div className="dashboard-wrapper">
             <div className="dashboard-header-flex">
@@ -295,7 +283,6 @@ const SupervisorDashboard = () => {
                                     <th>Username</th>
                                     <th>Role</th>
                                     <th>Created At</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -305,17 +292,6 @@ const SupervisorDashboard = () => {
                                         <td>{u.username}</td>
                                         <td><span className={`role-badge ${u.role}`}>{u.role}</span></td>
                                         <td>{u.createdAt}</td>
-                                        <td>
-                                            {currentUser?.role === 'Admin' && (
-                                                <button 
-                                                    className="action-btn"
-                                                    style={{ padding: '0.4rem 0.8rem', marginTop: 0, borderColor: '#ef4444', color: '#ef4444' }}
-                                                    onClick={() => handleDeleteUser(u.userId)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            )}
-                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
