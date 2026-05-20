@@ -321,6 +321,16 @@ Inside `AuthController.cs`, the server creates `Claims` (statements about the us
 ### Validation
 Because the token is signed with a secret key, the server doesn't need to look in the database to see if the token is valid. If a hacker tries to modify their token to change their role to "Admin", the cryptographic signature will break, and the ASP.NET middleware will reject it instantly.
 
+### Why is `AuthenticationWebApi` a Separate Microservice?
+In a standard app, login and token generation are handled by the `UserController`. In this project, `AuthenticationWebApi` is an **independent microservice running on Port 5228**. 
+*   **Security Isolation:** The only responsibility of this service is cryptographic signing. It doesn't even connect to the SQL database.
+*   **How it works:** 
+    1. The React app first asks the `UserViewerAPI` if the username/password are correct.
+    2. If correct, `UserViewerAPI` returns the user's role.
+    3. The React app then calls `AuthenticationWebApi` with that role.
+    4. `AuthenticationWebApi` mathematically signs the token and returns it. 
+*   **Benefits:** If the database crashes, or the User API goes down under heavy load, the Authentication server remains entirely unaffected and isolated, strictly generating and signing secure digital passports.
+
 ---
 
 # 14. Middleware Explanation
@@ -423,10 +433,30 @@ This is called **Loose Coupling**. If we wanted to switch from SQL Server to Mon
 
 ---
 
-# 20. Configuration Files
+# 20. Configuration Files & Program.cs Deep Dive
+
+### `Program.cs` (The Startup File)
+Every ASP.NET Core microservice starts in `Program.cs`. It has two main jobs:
+1.  **Service Registration (The Builder):** This is where we inject dependencies and configure settings *before* the app starts.
+    ```csharp
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Services.AddControllers(); // Enables API controllers
+    builder.Services.AddDbContext<UserDbContext>(...); // Connects to SQL Server
+    builder.Services.AddScoped<IUserRepository, EFUserRepository>(); // Registers DI
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)... // Configures JWT verification
+    ```
+2.  **Middleware Pipeline (The App):** This controls the exact order HTTP requests are processed.
+    ```csharp
+    var app = builder.Build();
+    app.UseCors(); // 1. Allow React frontend to connect
+    app.UseAuthentication(); // 2. Read the JWT token
+    app.UseAuthorization();  // 3. Check role permissions
+    app.MapControllers();    // 4. Send request to the Controller
+    app.Run();               // Starts listening on the port
+    ```
 
 ### `appsettings.json`
-Contains variables like database connection strings and JWT configuration.
+Contains environment variables like database connection strings and JWT secret keys. The `Program.cs` file reads this file on startup.
 
 ### `Ocelot.json`
 Contains the Gateway routing maps. It defines the `UpstreamPathTemplate` (what the frontend requests) and maps it to the `DownstreamPathTemplate` (the actual microservice port).
