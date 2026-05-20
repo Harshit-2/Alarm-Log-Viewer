@@ -549,3 +549,73 @@ graph TD
 *   **Gateways Simplify Frontend:** Ocelot completely hides the complexity of the backend from the React team. They just talk to one URL.
 *   **EF Core Speeds Development:** C# developers don't have to write manual SQL strings, reducing SQL Injection risks and speeding up coding.
 *   **Stateless Security:** Using JWT means the backend doesn't need to store active sessions in server memory, making the system highly scalable to thousands of users.
+
+---
+
+# 27. Complete File-by-File Breakdown
+
+To truly understand this microservices project, you must understand why every single file was created and what problem it solves.
+
+### Gateway Project (`AlarmLogViewerApiGateway`)
+*   **`Ocelot.json`**: Created to act as the traffic controller. **Problem Solved:** The React frontend would normally have to memorize 5 different ports (5025, 5286, etc.). This file maps all requests coming into port `5065` to their respective downstream microservices, simplifying frontend API calls.
+*   **`Program.cs`**: Registers Ocelot into the .NET pipeline.
+
+### Authentication Project (`AuthenticationWebApi`)
+*   **`Controllers/AuthController.cs`**: Created strictly to generate JWT tokens. **Problem Solved:** Centralizes token generation into one highly secure, stateless API that doesn't need database access.
+
+### Shared Contracts Project (`SharedContracts`)
+*   **`DTOs/UserDto.cs`, `RoomDto.cs`, `AlertDto.cs`**: Created to define data structures transferred over the network. **Problem Solved:** Prevents over-posting attacks and stops the backend from exposing sensitive database columns (like passwords or internal IDs) to the public frontend.
+
+### Frontend Project (`Frontend/src`)
+*   **`components/AdminDashboard.jsx`, `SupervisorDashboard.jsx`, `TechnicianDashboard.jsx`**: Created to render role-specific user interfaces. **Problem Solved:** Ensures that an Admin sees a completely different layout (User Management) compared to a Technician (Room Management).
+*   **`services/apiService.js`**: Created to handle all HTTP requests (Axios/fetch). **Problem Solved:** Prevents developers from having to manually attach the `Authorization: Bearer <token>` header on every single request across the app. It automatically injects the token centrally.
+*   **`App.jsx` & `main.jsx`**: Created to bootstrap the React application and manage frontend route navigation (e.g., `/login` vs `/dashboard`).
+
+### The Microservice Class Libraries (e.g., `UserLibrary`, `RoomsLibrary`)
+Each microservice has its own dedicated library containing the following exact pattern:
+*   **`Models/User.cs`, `Room.cs`, `Alert.cs`**: Created to represent database tables as C# objects. **Problem Solved:** Allows Entity Framework to understand what columns need to be created in SQL.
+*   **`Models/*DbContext.cs`**: Created to establish the SQL database connection (`UseSqlServer`). **Problem Solved:** Acts as the bridge between C# memory and the physical SQL Express database.
+*   **`Migrations/..._InitialMigration.cs`**: Created by the EF Core CLI (`Add-Migration`). **Problem Solved:** Contains the exact C# instructions to build the SQL schema if the database is deleted or deployed to a new server.
+*   **`Repos/IUserRepository.cs`, `IRoomRepository.cs`**: Created to define the contract (interface) for database operations. **Problem Solved:** Enables Loose Coupling and Dependency Injection.
+*   **`Repos/EFUserRepository.cs`, `EFRoomRepository.cs`**: Created to implement the actual database queries (`_context.Users.Add()`). **Problem Solved:** Hides all Entity Framework syntax from the API Controllers, keeping the controllers clean.
+*   **`Repos/*Exception.cs`**: Created to define custom error types. **Problem Solved:** Differentiates between a fatal SQL crash and a simple "User Not Found" error.
+
+### The Microservice APIs (e.g., `UserViewerAPI`, `RoomViewerAPI`)
+*   **`Controllers/*Controller.cs`**: Created to receive HTTP requests from Ocelot. **Problem Solved:** Reads incoming JSON, calls the Repository, and returns HTTP Status Codes (200 OK, 404 Not Found).
+*   **`Program.cs`**: Created to configure the pipeline for that specific microservice. **Problem Solved:** Registers the DbContext, sets up JWT bearer validation, and injects the Repositories so the controllers can function.
+
+---
+
+# 28. Microservices Database Syncing & Stub Tables
+
+### The Microservice Relationship Problem
+In a Monolithic application with a single SQL database, you can create a **Foreign Key** between the `Users` table and the `Rooms` table to ensure that a Room cannot be created by a User that doesn't exist.
+
+However, in this **Microservices Architecture**, the `Users` are stored in `PrjUserLogDB` and the `Rooms` are stored in `PrjRoomsDB`. 
+**SQL Server physically cannot enforce Foreign Keys across two completely separate databases.** 
+
+### The Solution: Stub/Dummy Tables
+To solve this, we use a concept called **Stub Tables** (or Dummy Tables) to maintain referential integrity within each isolated microservice.
+
+For example, look at the `UserLibrary`. Inside `UserLibrary/Models`, there is a `User.cs` file, but there is ALSO a `Room.cs` stub file.
+```csharp
+// UserLibrary/Models/Room.cs (Stub)
+public class Room
+{
+    [Key]
+    public string RoomId { get; set; }
+    // No MinTemp, No MaxTemp! Just the ID to satisfy EF Core relationships.
+}
+```
+
+### How Data Stays Synchronized
+If a Room is just a stub in the User database, how does it get there? We use **Synchronous HTTP Communication** between microservices.
+
+When a Technician creates a new Room, they send a POST request to the `RoomViewerAPI`:
+1. The `RoomViewerAPI` saves the full, detailed Room to `PrjRoomsDB`.
+2. Immediately after saving, the `RoomController` makes a hidden, backend-to-backend HTTP request using `HttpClient` to the other microservices (like User API or Alert API).
+3. It sends *only the IDs* (`RoomId`, `UserId`) to those other APIs.
+4. The other APIs receive this request and insert the ID into their "Stub/Dummy" tables.
+
+### Why this solves the problem
+By pushing these IDs to the stub tables, Entity Framework within the `UserLibrary` can successfully query a User and `Include()` their associated Room IDs without crashing, maintaining a localized version of the relationship tree without violating microservice boundary rules!
