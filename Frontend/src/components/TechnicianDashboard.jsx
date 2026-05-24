@@ -247,12 +247,8 @@ const TechnicianDashboard = ({ userId }) => {
                 <div className="rooms-grid">
                     {displayedRooms.map(room => {
                         const activeAlert = getActiveAlert(room.roomId);
-                        const hasAlert = !!activeAlert;
-                        const statusClass = hasAlert 
-                            ? (activeAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
-                            : "safe-active";
                         return (
-                        <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
+                        <div key={room.roomId} className="room-card safe-active">
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
                                 <span className="room-id">{room.roomId}</span>
