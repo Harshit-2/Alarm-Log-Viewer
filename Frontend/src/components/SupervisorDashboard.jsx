@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
 import './Dashboards.css';
-import EnvironmentBackground from './EnvironmentBackground';
 
 const SupervisorDashboard = () => {
     const { user: currentUser } = useAuth();
@@ -24,7 +23,7 @@ const SupervisorDashboard = () => {
 
     useEffect(() => {
         fetchAllData();
-        
+
         // Polling for updates every 5 seconds to see new alerts dynamically
         const interval = setInterval(() => {
             fetchAllData();
@@ -116,32 +115,23 @@ const SupervisorDashboard = () => {
     };
 
     // Count only active (unresolved) alerts for rooms that still exist
-    const activeAlerts = alerts.filter(a => 
+    const activeAlerts = alerts.filter(a =>
         a.status !== "Resolved" && rooms.some(r => r.roomId === a.roomId)
     );
 
-    // Determine global background state
-    let globalBgState = 'normal';
-    if (activeAlerts.some(a => a.status === 'Too Hot')) {
-        globalBgState = 'hot';
-    } else if (activeAlerts.some(a => a.status === 'Too Cold')) {
-        globalBgState = 'cold';
-    }
-
     return (
         <div className="dashboard-wrapper">
-            <EnvironmentBackground state={globalBgState} />
             <div className="dashboard-header-flex">
                 <h2>Global System Dashboard</h2>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <div className="tabs-container">
-                        <button 
+                        <button
                             className={`tab-btn ${activeTab === 'monitoring' ? 'active' : ''}`}
                             onClick={() => setActiveTab('monitoring')}
                         >
                             Monitoring
                         </button>
-                        <button 
+                        <button
                             className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
                             onClick={() => setActiveTab('users')}
                         >
@@ -192,8 +182,8 @@ const SupervisorDashboard = () => {
                                 const hasAlert = roomAlerts.length > 0;
                                 const latestAlert = hasAlert ? roomAlerts[roomAlerts.length - 1] : null;
 
-                                const statusClass = hasAlert 
-                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
+                                const statusClass = hasAlert
+                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold")
                                     : "safe-active";
 
                                 return (
@@ -220,7 +210,7 @@ const SupervisorDashboard = () => {
                                             ) : (
                                                 <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
                                             )}
-                                            
+
                                             {hasAlert && (
                                                 <div className="alert-details">
                                                     <p className="text-red"><strong>Status:</strong> {latestAlert.status}</p>
@@ -249,7 +239,7 @@ const SupervisorDashboard = () => {
                                                                 setShowResolveModal(true);
                                                             }}
                                                         >
-                                                            ✅ Mark Resolved
+                                                            Mark Resolved
                                                         </button>
                                                         <button
                                                             className="action-btn"
@@ -264,7 +254,7 @@ const SupervisorDashboard = () => {
                                                                 }
                                                             }}
                                                         >
-                                                            🗑️ Delete Alert
+                                                            Delete Alert
                                                         </button>
                                                     </div>
                                                 </div>
@@ -292,7 +282,7 @@ const SupervisorDashboard = () => {
                                     <th>User ID</th>
                                     <th>Username</th>
                                     <th>Role</th>
-                                    <th>Created At</th>
+                                    <th>Created On</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -314,7 +304,7 @@ const SupervisorDashboard = () => {
             {showResolveModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h3>✅ Resolve Alert</h3>
+                        <h3>Resolve Alert</h3>
                         <p className="modal-subtitle">
                             Please describe what the issue was and the steps taken to fix it.
                         </p>
