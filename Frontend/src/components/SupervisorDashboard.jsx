@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
 import './Dashboards.css';
+import EnvironmentBackground from './EnvironmentBackground';
 
 const SupervisorDashboard = () => {
     const { user: currentUser } = useAuth();
@@ -119,8 +120,17 @@ const SupervisorDashboard = () => {
         a.status !== "Resolved" && rooms.some(r => r.roomId === a.roomId)
     );
 
+    // Determine global background state
+    let globalBgState = 'normal';
+    if (activeAlerts.some(a => a.status === 'Too Hot')) {
+        globalBgState = 'hot';
+    } else if (activeAlerts.some(a => a.status === 'Too Cold')) {
+        globalBgState = 'cold';
+    }
+
     return (
         <div className="dashboard-wrapper">
+            <EnvironmentBackground state={globalBgState} />
             <div className="dashboard-header-flex">
                 <h2>Global System Dashboard</h2>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>

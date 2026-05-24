@@ -1,0 +1,164 @@
+.environment-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    transition: background-color 1.5s ease;
+}
+
+.environment-bg.cold {
+    background-color: #EBF4FF; /* very light blue for cold */
+}
+
+.environment-bg.hot {
+    background-color: #FFF5F5; /* very light red/orange for hot */
+}
+
+/* --- COLD ANIMATION --- */
+.cold-animation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.cloud-container {
+    position: absolute;
+    top: 5%;
+    width: 100%;
+    height: 200px;
+}
+
+.cloud {
+    position: absolute;
+    opacity: 0.5;
+    animation: float-cloud linear infinite;
+}
+
+.cloud.c1 {
+    top: 20px;
+    width: 180px;
+    animation-duration: 60s;
+    animation-delay: -10s;
+}
+
+.cloud.c2 {
+    top: 60px;
+    width: 120px;
+    animation-duration: 45s;
+    animation-delay: -25s;
+}
+
+.cloud.c3 {
+    top: 100px;
+    width: 150px;
+    animation-duration: 55s;
+    animation-delay: -40s;
+}
+
+@keyframes float-cloud {
+    0% { transform: translateX(-200px); }
+    100% { transform: translateX(120vw); }
+}
+
+.snowflakes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.snowflake {
+    position: absolute;
+    top: -50px;
+    color: #A0AEC0;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 5px rgba(255,255,255,0.6);
+    animation: fall linear infinite, sway ease-in-out infinite alternate;
+    opacity: 0.6;
+}
+
+@keyframes fall {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(110vh); }
+}
+@keyframes sway {
+    0% { transform: translateX(-15px); }
+    100% { transform: translateX(15px); }
+}
+
+/* --- HOT ANIMATION --- */
+.hot-animation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.sun-container {
+    position: absolute;
+    top: 15%;
+    right: 15%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sun-svg {
+    width: 100px;
+    height: 100px;
+    animation: rotate-sun 30s linear infinite;
+    opacity: 0.6;
+}
+
+.sun-glow {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251,211,141,0.5) 0%, rgba(251,211,141,0) 70%);
+    animation: pulse-glow 5s ease-in-out infinite alternate;
+}
+
+@keyframes rotate-sun {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes pulse-glow {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.2); opacity: 0.4; }
+}
+
+.dunes {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30vh;
+    min-height: 200px;
+}
+
+.tree-container {
+    position: absolute;
+    bottom: 8vh;
+    right: 8vw;
+    width: 180px;
+    opacity: 0.5;
+    animation: slight-wind 6s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+}
+
+.oak-tree {
+    width: 100%;
+    height: auto;
+}
+
+@keyframes slight-wind {
+    0% { transform: rotate(-1.5deg); }
+    100% { transform: rotate(1.5deg); }
+}
