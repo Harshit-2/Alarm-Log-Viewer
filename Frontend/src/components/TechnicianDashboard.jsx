@@ -257,7 +257,7 @@ const TechnicianDashboard = ({ userId }) => {
                                 <p><strong>Max Temp:</strong> {room.maxTemp}°C</p>
                                 {/* Show if a reason has already been filed for an active alert */}
                                 {activeAlert && activeAlert.reason && (
-                                    <p style={{ color: '#facc15', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                    <p style={{ color: '#D97706', fontSize: '0.85rem', marginTop: '0.5rem' }}>
                                         <strong>Reason filed:</strong> {activeAlert.reason}
                                     </p>
                                 )}
@@ -277,7 +277,7 @@ const TechnicianDashboard = ({ userId }) => {
                                     <>
                                         <button 
                                             className="action-btn"
-                                            style={{ marginTop: 0, flex: 1, borderColor: '#a5b4fc', color: '#a5b4fc', background: 'transparent' }}
+                                            style={{ marginTop: 0, flex: 1, borderColor: '#5C7CFA', color: '#5C7CFA', background: 'transparent' }}
                                             onClick={() => {
                                                 setIsEditing(true);
                                                 setNewRoom({ id: room.roomId, name: room.roomName, minTemp: room.minTemp, maxTemp: room.maxTemp });
@@ -288,7 +288,7 @@ const TechnicianDashboard = ({ userId }) => {
                                         </button>
                                         <button 
                                             className="action-btn"
-                                            style={{ marginTop: 0, flex: 1, borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                            style={{ marginTop: 0, flex: 1, borderColor: '#E53E3E', color: '#E53E3E', background: 'transparent' }}
                                             onClick={() => handleDeleteRoom(room.roomId)}
                                         >
                                             Delete
@@ -299,7 +299,7 @@ const TechnicianDashboard = ({ userId }) => {
                                 {activeAlert && (
                                     <button
                                         className="action-btn"
-                                        style={{ marginTop: 0, flex: 1, borderColor: '#f97316', color: '#f97316', background: 'transparent' }}
+                                        style={{ marginTop: 0, flex: 1, borderColor: '#DD6B20', color: '#DD6B20', background: 'transparent' }}
                                         onClick={() => {
                                             setAlertForReason(activeAlert);
                                             setReasonValue(activeAlert.reason || '');
@@ -409,7 +409,7 @@ const TechnicianDashboard = ({ userId }) => {
                                     required
                                     value={reasonValue}
                                     onChange={(e) => setReasonValue(e.target.value)}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155' }}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#F7F8FA', color: '#2D3748', border: '1px solid #E2E8F0' }}
                                 >
                                     <option value="">-- Choose a reason --</option>
                                     <option value="Equipment malfunction">Equipment malfunction</option>

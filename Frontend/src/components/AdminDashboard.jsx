@@ -74,7 +74,7 @@ const AdminDashboard = () => {
                                     <td>
                                         <button 
                                             className="action-btn"
-                                            style={{ padding: '0.4rem 0.8rem', marginTop: 0, borderColor: '#ef4444', color: '#ef4444' }}
+                                            style={{ padding: '0.4rem 0.8rem', marginTop: 0, borderColor: '#E53E3E', color: '#E53E3E', background: 'transparent' }}
                                             onClick={() => handleDeleteUser(u.userId)}
                                         >
                                             Delete

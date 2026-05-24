@@ -203,12 +203,12 @@ const SupervisorDashboard = () => {
                                             {/* Show latest temperature reading from Temperature Service */}
                                             {temperatures[room.roomId] ? (
                                                 <p><strong>Latest Temp:</strong> {temperatures[room.roomId].temperatureValue}°C
-                                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.4rem' }}>
+                                                    <span style={{ fontSize: '0.75rem', color: '#718096', marginLeft: '0.4rem' }}>
                                                         at {new Date(temperatures[room.roomId].recordedAt).toLocaleTimeString()}
                                                     </span>
                                                 </p>
                                             ) : (
-                                                <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>No temperature recorded yet</p>
+                                                <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
                                             )}
                                             
                                             {hasAlert && (
@@ -218,11 +218,11 @@ const SupervisorDashboard = () => {
                                                     <p className="alert-time">At: {new Date(latestAlert.alertTime).toLocaleString()}</p>
                                                     {/* Show the reason filed by the technician */}
                                                     {latestAlert.reason ? (
-                                                        <p style={{ color: '#facc15', marginTop: '0.4rem' }}>
+                                                        <p style={{ color: '#D97706', marginTop: '0.4rem' }}>
                                                             <strong>Technician reason:</strong> {latestAlert.reason}
                                                         </p>
                                                     ) : (
-                                                        <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '0.4rem' }}>
+                                                        <p style={{ color: '#718096', fontSize: '0.8rem', marginTop: '0.4rem' }}>
                                                             No reason filed yet by technician.
                                                         </p>
                                                     )}
@@ -230,7 +230,7 @@ const SupervisorDashboard = () => {
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                                                         <button
                                                             className="action-btn"
-                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#22c55e', color: '#22c55e', background: 'transparent' }}
+                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#16A34A', color: '#16A34A', background: 'transparent' }}
                                                             onClick={() => {
                                                                 // Open the resolve modal instead of directly resolving
                                                                 setAlertToResolve(latestAlert);
@@ -243,7 +243,7 @@ const SupervisorDashboard = () => {
                                                         </button>
                                                         <button
                                                             className="action-btn"
-                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#ef4444', color: '#ef4444', background: 'transparent' }}
+                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#E53E3E', color: '#E53E3E', background: 'transparent' }}
                                                             onClick={async () => {
                                                                 if (!window.confirm('Delete this alert permanently?')) return;
                                                                 try {
@@ -326,13 +326,13 @@ const SupervisorDashboard = () => {
                             }
                         }}>
                             <div className="form-group">
-                                <label>Resolution Notes <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>(optional)</span></label>
+                                <label>Resolution Notes <span style={{ color: '#718096', fontSize: '0.8rem' }}>(optional)</span></label>
                                 <textarea
                                     rows={4}
                                     value={resolveNote}
                                     onChange={(e) => setResolveNote(e.target.value)}
                                     placeholder="e.g. The AC unit was overheating due to a clogged filter. The filter was cleaned and the unit was restarted. Temperature returned to normal."
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#1e293b', color: '#e2e8f0', border: '1px solid #334155', resize: 'vertical' }}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: '#F7F8FA', color: '#2D3748', border: '1px solid #E2E8F0', resize: 'vertical' }}
                                 />
                             </div>
                             <div className="modal-actions">
