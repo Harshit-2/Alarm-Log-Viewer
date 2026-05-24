@@ -90,7 +90,7 @@ Here is a breakdown of the important folders and why they exist in this solution
 When a frontend user clicks a button to get a list of users, this is the exact journey the request takes:
 
 1.  **Frontend Action:** User clicks "View Users" in React.
-2.  **HTTP Request:** React (Axios/fetch) sends an HTTP GET request to `http://localhost:5065/userSvc` with the JWT token in the header.
+2.  **HTTP Request:** React (using the native `fetch` API) sends an HTTP GET request to `http://localhost:5065/userSvc` with the JWT token in the header.
 3.  **API Gateway (Ocelot):** Ocelot receives the request on Port `5065`, looks at `Ocelot.json`, and sees `/userSvc` maps to the User microservice on Port `5025`. It forwards the request.
 4.  **Middleware/Routing:** The `UserViewerAPI` receives the request. The ASP.NET routing engine matches the HTTP GET method to the `UserController.GetAll()` method.
 5.  **Controller:** The `UserController` receives the call. It asks the injected `IUserRepository` for data.
@@ -128,7 +128,7 @@ sequenceDiagram
 # 5. Frontend to Backend Communication
 
 ### How frontend calls backend
-The React application uses an HTTP client (like `fetch` or `axios`) inside a centralized `apiService.js` file to make requests to the backend.
+The React application uses the native `fetch` API inside a centralized `apiService.js` file to make requests to the backend.
 
 ### API calling mechanism
 All requests are sent to the **Base URL** of the Ocelot Gateway: `http://localhost:5065`.
@@ -568,7 +568,7 @@ To truly understand this microservices project, you must understand why every si
 
 ### Frontend Project (`Frontend/src`)
 *   **`components/AdminDashboard.jsx`, `SupervisorDashboard.jsx`, `TechnicianDashboard.jsx`**: Created to render role-specific user interfaces. **Problem Solved:** Ensures that an Admin sees a completely different layout (User Management) compared to a Technician (Room Management).
-*   **`services/apiService.js`**: Created to handle all HTTP requests (Axios/fetch). **Problem Solved:** Prevents developers from having to manually attach the `Authorization: Bearer <token>` header on every single request across the app. It automatically injects the token centrally.
+*   **`services/apiService.js`**: Created to handle all HTTP requests using the native `fetch` API. **Problem Solved:** Prevents developers from having to manually attach the `Authorization: Bearer <token>` header on every single request across the app. It automatically injects the token centrally.
 *   **`App.jsx` & `main.jsx`**: Created to bootstrap the React application and manage frontend route navigation (e.g., `/login` vs `/dashboard`).
 
 ### The Microservice Class Libraries (e.g., `UserLibrary`, `RoomsLibrary`)
@@ -619,3 +619,27 @@ When a Technician creates a new Room, they send a POST request to the `RoomViewe
 
 ### Why this solves the problem
 By pushing these IDs to the stub tables, Entity Framework within the `UserLibrary` can successfully query a User and `Include()` their associated Room IDs without crashing, maintaining a localized version of the relationship tree without violating microservice boundary rules!
+
+---
+
+# 29. Latest Frontend UI Updates (What's New)
+
+The frontend recently underwent a major redesign to make it cleaner, more professional, and easier to use. Here is a super simple breakdown of what is new:
+
+### 1. Light Theme & Modern Design
+The entire application was moved away from a dark theme to a clean, relaxing **Light Theme** (white surfaces, light gray backgrounds, and soft shadows). This makes the dashboard feel much more modern and comfortable for the eyes.
+
+### 2. Auto-Refresh (Polling)
+You no longer need to hit the "Refresh" button in your browser to see live updates! 
+- **Admin Dashboard:** Automatically checks for new users every 5 seconds.
+- **Supervisor Dashboard:** Automatically pulls new alerts from the system every 5 seconds.
+- **Technician Dashboard:** Automatically refreshes the moment a temperature is recorded, so the "File Reason" button appears instantly if a room gets too hot or too cold.
+
+### 3. Smart Background Animations
+To make the **Supervisor Dashboard** more intuitive, subtle background animations were added using pure CSS:
+- **When a room is Too Cold:** You will see faint clouds floating and snowflakes falling gently in the background.
+- **When a room is Too Hot:** A soft pulsing sun and a desert scene appear in the background.
+These animations are transparent enough so they don't distract from the important text.
+
+### 4. Native Fetch API (No Axios)
+The project originally used a third-party library called Axios to make network requests, but it has been completely updated to use the browser's native `fetch` API. This removes unnecessary third-party dependencies, making the frontend faster and more lightweight.
