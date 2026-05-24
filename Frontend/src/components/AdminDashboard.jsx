@@ -10,6 +10,12 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         fetchUsers();
+
+        const interval = setInterval(() => {
+            fetchUsers();
+        }, 5000); // Poll for updates every 5 seconds
+
+        return () => clearInterval(interval);
     }, []);
 
     const fetchUsers = async () => {

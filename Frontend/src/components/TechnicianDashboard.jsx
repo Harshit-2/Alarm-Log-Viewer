@@ -194,6 +194,7 @@ const TechnicianDashboard = ({ userId }) => {
             setShowTempModal(false);
             setTempValue('');
             setTempError('');
+            fetchData();
         } catch (err) {
             // Show error inside the modal instead of a browser alert popup
             setTempError('Failed to record temperature: ' + err.message);
@@ -246,8 +247,12 @@ const TechnicianDashboard = ({ userId }) => {
                 <div className="rooms-grid">
                     {displayedRooms.map(room => {
                         const activeAlert = getActiveAlert(room.roomId);
+                        const hasAlert = !!activeAlert;
+                        const statusClass = hasAlert 
+                            ? (activeAlert.status === "Too Hot" ? "too-hot" : "too-cold") 
+                            : "safe-active";
                         return (
-                        <div key={room.roomId} className="room-card safe-active">
+                        <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
                                 <span className="room-id">{room.roomId}</span>

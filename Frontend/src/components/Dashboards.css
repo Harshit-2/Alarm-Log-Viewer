@@ -112,20 +112,32 @@
 .room-card.safe-active {
     border-top: 4px solid #48BB78;
 }
+.room-card.safe-active:hover {
+    border-left-color: #48BB78;
+    border-right-color: #48BB78;
+    border-bottom-color: #48BB78;
+}
 
-.room-card.alert-active {
+/* Too Hot State */
+.room-card.too-hot {
     border-top: 4px solid #F56565;
     background: #FFF5F5;
 }
-
-/* Too Hot Animation */
-.room-card.too-hot {
-    border-top: 4px solid #ED8936;
+.room-card.too-hot:hover {
+    border-left-color: #ED8936;
+    border-right-color: #ED8936;
+    border-bottom-color: #ED8936;
 }
 
-/* Too Cold Animation */
+/* Too Cold State */
 .room-card.too-cold {
     border-top: 4px solid #4299E1;
+    background: #EFF6FF;
+}
+.room-card.too-cold:hover {
+    border-left-color: #4299E1;
+    border-right-color: #4299E1;
+    border-bottom-color: #4299E1;
 }
 
 .room-header {
