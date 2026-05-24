@@ -34,23 +34,7 @@ namespace AlarmLogViewerAPI.Controllers
             return Ok(alerts);
         }
 
-        // GET a single alert by its ID
-        [HttpGet("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult> GetOne(string id)
-        {
-            try
-            {
-                Alert alert = await alertRepo.GetByAlertIdAsync(id);
-                return Ok(alert);
-            }
-            catch (AlertException ex)
-            {
-                _logger.LogWarning("Alert not found: {AlertId}", id);
-                return NotFound(ex.Message);
-            }
-        }
+
 
         // GET all alerts for a specific room
         [HttpGet("room/{roomId}")]
@@ -70,22 +54,7 @@ namespace AlarmLogViewerAPI.Controllers
             }
         }
 
-        // GET alerts by status (e.g. "Too Hot", "Too Cold", "Resolved")
-        [HttpGet("status/{status}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult> GetByStatus(string status)
-        {
-            try
-            {
-                Alert alert = await alertRepo.GetByStatusAsync(status);
-                return Ok(alert);
-            }
-            catch (AlertException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
+
 
         // POST — Technician creates a new alert (temperature out of range)
         [HttpPost]
@@ -186,15 +155,7 @@ namespace AlarmLogViewerAPI.Controllers
             }
         }
 
-        // GET — Returns all activity logs so supervisors can see the full history
-        [HttpGet("logs")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult> GetActivityLogs()
-        {
-            var logs = await alertRepo.GetAllLogsAsync();
-            _logger.LogInformation("Fetched activity logs. Total entries: {Count}", logs.Count);
-            return Ok(logs);
-        }
+
 
         // This is called automatically by the Room service when a new room is created
         [HttpPost("Room")]

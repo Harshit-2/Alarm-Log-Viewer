@@ -26,21 +26,7 @@ namespace UserViewerAPI.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult> GetOne(string id)
-        {
-            try
-            {
-                User user = await userRepo.GetByIdAsync(id);
-                return Ok(user);
-            }
-            catch (UserException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
+
 
         [HttpGet("credentials")]
         [AllowAnonymous]
@@ -80,21 +66,7 @@ namespace UserViewerAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        public async Task<ActionResult> Update(string id, [FromBody] User user)
-        {
-            try
-            {
-                await userRepo.UpdateAsync(id, user);
-                return Ok(user);
-            }
-            catch (UserException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]

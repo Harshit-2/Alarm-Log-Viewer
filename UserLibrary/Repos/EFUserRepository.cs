@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -61,27 +61,6 @@ namespace UserLibrary.Repos
             return user;
         }
 
-        public async Task UpdateAsync(string id, User user)
-        {
-            try
-            {
-                var existingUser = await context.Users.FirstOrDefaultAsync(u => u.UserId == id);
-                if (existingUser == null)
-                {
-                    throw new UserException($"No user found with id {id}");
-                }
 
-                // Update fields
-                existingUser.Username = user.Username;
-                existingUser.Password = user.Password;
-                existingUser.Role = user.Role;
-
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new UserException(ex.Message);
-            }
-        }
     }
 }

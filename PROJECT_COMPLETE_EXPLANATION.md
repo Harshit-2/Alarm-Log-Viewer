@@ -622,24 +622,24 @@ By pushing these IDs to the stub tables, Entity Framework within the `UserLibrar
 
 ---
 
-# 29. Latest Frontend UI Updates (What's New)
+# 29. Frontend UI & Features
 
-The frontend recently underwent a major redesign to make it cleaner, more professional, and easier to use. Here is a super simple breakdown of what is new:
+The React frontend is designed to be clean, professional, and intuitive.
 
 ### 1. Light Theme & Modern Design
-The entire application was moved away from a dark theme to a clean, relaxing **Light Theme** (white surfaces, light gray backgrounds, and soft shadows). This makes the dashboard feel much more modern and comfortable for the eyes.
+The application features a clean, relaxing **Light Theme** (white surfaces, light gray backgrounds, and soft shadows). This modern design ensures the dashboard is comfortable for the eyes during extended use.
 
-### 2. Auto-Refresh (Polling)
-You no longer need to hit the "Refresh" button in your browser to see live updates! 
+### 2. Real-Time Auto-Refresh
+The dashboard automatically stays up to date without requiring manual page reloads:
 - **Admin Dashboard:** Automatically checks for new users every 5 seconds.
 - **Supervisor Dashboard:** Automatically pulls new alerts from the system every 5 seconds.
-- **Technician Dashboard:** Automatically refreshes the moment a temperature is recorded, so the "File Reason" button appears instantly if a room gets too hot or too cold.
+- **Technician Dashboard:** Automatically refreshes the moment a temperature is recorded, displaying the "File Reason" button instantly if a room's temperature goes out of bounds.
 
 ### 3. Smart Background Animations
-To make the **Supervisor Dashboard** more intuitive, subtle background animations were added using pure CSS:
-- **When a room is Too Cold:** You will see faint clouds floating and snowflakes falling gently in the background.
+The **Supervisor Dashboard** utilizes intuitive, pure CSS background animations to indicate room states visually:
+- **When a room is Too Cold:** Faint clouds float and snowflakes fall gently in the background.
 - **When a room is Too Hot:** A soft pulsing sun and a desert scene appear in the background.
-These animations are transparent enough so they don't distract from the important text.
+These animations are highly transparent so they never distract from the critical text and data.
 
-### 4. Native Fetch API (No Axios)
-The project originally used a third-party library called Axios to make network requests, but it has been completely updated to use the browser's native `fetch` API. This removes unnecessary third-party dependencies, making the frontend faster and more lightweight.
+### 4. Native Fetch API
+The project uses the browser's native `fetch` API for all network requests. This zero-dependency approach makes the frontend fast, secure, and lightweight.

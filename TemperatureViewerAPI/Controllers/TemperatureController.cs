@@ -21,19 +21,7 @@ namespace TemperatureWebApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var temps = await _repository.GetAllTemperaturesAsync();
-            return Ok(temps);
-        }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
-        {
-            var temp = await _repository.GetByIdAsync(id);
-            return Ok(temp);
-        }
 
         [HttpGet("room/{roomId}")]
         public async Task<IActionResult> GetByRoom(string roomId)
@@ -50,12 +38,7 @@ namespace TemperatureWebApi.Controllers
             }
         }
 
-        [HttpGet("room/{roomId}/latest")]
-        public async Task<IActionResult> GetLatestByRoom(string roomId)
-        {
-            var temp = await _repository.GetLatestByRoomIdAsync(roomId);
-            return Ok(temp);
-        }
+
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Temperature temperature)
@@ -67,25 +50,10 @@ namespace TemperatureWebApi.Controllers
                 "TEMPERATURE RECORDED — ReadingId: {Id}, RoomId: {RoomId}, Value: {Temp}°C",
                 temperature.ReadingId, temperature.RoomId, temperature.TemperatureValue);
 
-            return CreatedAtAction(nameof(GetById), new { id = temperature.ReadingId }, temperature);
+            return StatusCode(201, temperature);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] Temperature temperature)
-        {
-            await _repository.UpdateAsync(id, temperature);
-            _logger.LogInformation(
-                "TEMPERATURE UPDATED — ReadingId: {Id}, RoomId: {RoomId}, NewValue: {Temp}°C",
-                id, temperature.RoomId, temperature.TemperatureValue);
-            return NoContent();
-        }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            await _repository.DeleteAsync(id);
-            return NoContent();
-        }
 
         [HttpPost("Room")]
         [AllowAnonymous]

@@ -40,19 +40,7 @@ namespace RoomsLibrary.Repos
             return room;
         }
 
-        public async Task<List<Room>> GetByCreatorAsync(string userId)
-        {
-            var rooms = await context.Rooms
-                .Where(r => r.CreatedByUserId == userId)
-                .ToListAsync();
 
-            if (rooms.Count == 0)
-            {
-                throw new RoomException("No rooms found");
-            }
-
-            return rooms;
-        }
 
         public async Task UpdateAsync(string id, Room room)
         {

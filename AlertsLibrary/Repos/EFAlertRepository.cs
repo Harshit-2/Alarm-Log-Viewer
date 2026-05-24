@@ -40,15 +40,7 @@ namespace AlertsLibrary.Repos
             return alert;
         }
 
-        public async Task<Alert> GetByStatusAsync(string status)
-        {
-            Alert alert = await context.Alerts.FirstOrDefaultAsync(x => x.Status == status);
-            if (alert == null)
-            {
-                throw new AlertException("No alert found with the given status");
-            }
-            return alert;
-        }
+
 
         public async Task UpdateAlertAsync(string id, Alert alert)
         {
@@ -131,12 +123,6 @@ namespace AlertsLibrary.Repos
             await context.SaveChangesAsync();
         }
 
-        // Returns all activity logs so supervisors can see the full history
-        public async Task<List<ActivityLog>> GetAllLogsAsync()
-        {
-            return await context.ActivityLogs
-                .OrderByDescending(log => log.Timestamp) // Newest first
-                .ToListAsync();
-        }
+
     }
 }

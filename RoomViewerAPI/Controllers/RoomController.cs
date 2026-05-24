@@ -30,39 +30,7 @@ namespace RoomViewerAPI.Controllers
             return Ok(rooms);
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
 
-        public async Task<ActionResult> GetOne(string id)
-        {
-            try
-            {
-                Room room = await roomRepo.GetByIdAsync(id);
-                return Ok(room);
-            }
-            catch (RoomException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
-
-
-        [HttpGet("creator/{userId}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<List<Room>>> GetByCreatorAsync(string userId)
-        {
-            try
-            {
-                var rooms = await roomRepo.GetByCreatorAsync(userId);
-                return Ok(rooms);
-            }
-            catch (RoomException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
 
         [HttpPost]
         [ProducesResponseType(201)]

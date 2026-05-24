@@ -9,7 +9,7 @@ namespace RoomsLibrary.Repos
     {
         Task<Room> GetByIdAsync(string id);
         Task<List<Room>> GetAllAsync();
-        Task<List<Room>> GetByCreatorAsync(string userId);
+
         Task AddAsync(Room room);
         Task UpdateAsync(string id, Room room);
         Task DeleteAsync(string id);
