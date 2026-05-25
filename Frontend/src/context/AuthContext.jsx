@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
         return user;
     };
 
-    const register = async (fullName, email, password, role) => {
-        await authService.register(fullName, email, password, role);
+    const register = async (fullName, email, password, role, adminKey) => {
+        await authService.register(fullName, email, password, role, adminKey);
         // Automatically log in after successful registration
         return await login(email, password);
     };

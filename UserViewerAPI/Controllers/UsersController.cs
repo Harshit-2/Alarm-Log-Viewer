@@ -49,10 +49,18 @@ namespace UserViewerAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> Insert([FromBody] User user)
+        public async Task<ActionResult> Insert([FromBody] User user, [FromQuery] string adminKey = null)
         {
             try
             {
+                if (user.Role == "Admin")
+                {
+                    if (adminKey != "cognizant")
+                    {
+                        return BadRequest("Invalid Admin Authorization Key. Registration failed.");
+                    }
+                }
+
                 await userRepo.AddAsync(user);
 
                 HttpClient roomHttp = new HttpClient() { BaseAddress = new Uri("http://localhost:5286/api/Room/") };

@@ -42,7 +42,7 @@ export const authService = {
         };
     },
 
-    async register(fullName, email, password, role) {
+    async register(fullName, email, password, role, adminKey) {
         const currentDate = new Date().toISOString().split('T')[0];
 
         const newUser = {
@@ -53,9 +53,11 @@ export const authService = {
             createdAt: currentDate
         };
 
+        const url = adminKey ? `${GATEWAY_URL}/userSvc?adminKey=${encodeURIComponent(adminKey)}` : `${GATEWAY_URL}/userSvc`;
+
         let res;
         try {
-            res = await fetch(`${GATEWAY_URL}/userSvc`, {
+            res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

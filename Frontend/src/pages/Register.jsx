@@ -9,6 +9,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [role, setRole] = useState('Technician');
+    const [adminKey, setAdminKey] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
@@ -59,6 +60,11 @@ const Register = () => {
             return false;
         }
 
+        if (role === 'Admin' && !adminKey) {
+            setError('Please enter the Admin Access Code to register as an Admin.');
+            return false;
+        }
+
         return true;
     };
 
@@ -71,7 +77,7 @@ const Register = () => {
         setLoading(true);
 
         try {
-            await register(fullName, email, password, role);
+            await register(fullName, email, password, role, adminKey);
             // Registration automatically logs in, so we redirect to dashboard
             navigate('/dashboard', { replace: true });
         } catch (err) {
@@ -170,6 +176,23 @@ const Register = () => {
                             <option value="Admin">Admin</option>
                         </select>
                     </div>
+
+                    {role === 'Admin' && (
+                        <div className="form-group" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                            <label htmlFor="adminKey" style={{ color: '#E53E3E', fontWeight: 'bold' }}>
+                                Admin Access Code <span style={{ color: '#E53E3E' }}>*</span>
+                            </label>
+                            <input
+                                type="password"
+                                id="adminKey"
+                                value={adminKey}
+                                onChange={(e) => setAdminKey(e.target.value)}
+                                placeholder="Enter the secret admin key"
+                                style={{ borderColor: '#FC8181', boxShadow: '0 0 0 1px rgba(252, 129, 129, 0.2)' }}
+                                required
+                            />
+                        </div>
+                    )}
 
                     <button 
                         type="submit" 
