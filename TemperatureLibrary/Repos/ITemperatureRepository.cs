@@ -7,7 +7,7 @@ namespace TemperatureLibrary.Repos
 {
     public interface ITemperatureRepository
     {
-        Task<Temperature> GetByRoomIdAsync(string roomId);
+        Task<List<Temperature>> GetByRoomIdAsync(string roomId);
         Task AddAsync(Temperature temperature);
         Task AddRoomStubAsync(Room room);
     }

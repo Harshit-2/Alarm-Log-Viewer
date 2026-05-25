@@ -25,19 +25,21 @@ namespace TemperatureLibrary.Repos
 
 
 
-        public async Task<Temperature> GetByRoomIdAsync(string roomId)
+        public async Task<List<Temperature>> GetByRoomIdAsync(string roomId)
         {
             try
             {
-                var temp = await context.Temperatures
-                    .FirstOrDefaultAsync(t => t.RoomId == roomId);
+                var temps = await context.Temperatures
+                    .Where(t => t.RoomId == roomId)
+                    .OrderBy(t => t.RecordedAt)
+                    .ToListAsync();
 
-                if (temp == null)
+                if (temps == null || temps.Count == 0)
                 {
                     throw new TemperatureException("No temperature found for this room");
                 }
 
-                return temp;
+                return temps;
             }
             catch (Exception ex)
             {
