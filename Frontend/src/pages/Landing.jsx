@@ -10,36 +10,25 @@ const Landing = () => {
     // State for interactive 3D rotations and glare tracking
     const [mousePos, setMousePos] = useState({ x: 0, y: 0, glareX: 0, glareY: 0 });
 
-    // Track mouse movement globally over the container
     const handleMouseMove = (e) => {
-        // Find center of screen
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
-        
-        // Normalize mouse coordinates (-1 to 1)
         const xNormalized = (e.clientX - centerX) / centerX;
         const yNormalized = (e.clientY - centerY) / centerY;
-        
-        // Calculate max tilt (e.g. 25 degrees)
-        const maxTilt = 25;
+        const maxTilt = 20; // Slightly reduced for a heavier, premium feel
         
         setMousePos({
-            // Tilt X goes up when mouse goes down
             x: -yNormalized * maxTilt,
-            // Tilt Y goes right when mouse goes right
             y: xNormalized * maxTilt,
-            // Glare moves exactly opposite to create light reflection illusion
             glareX: xNormalized * -50,
             glareY: yNormalized * -50
         });
     };
 
-    // When mouse leaves the window, reset to neutral isometric view
     const handleMouseLeave = () => {
         setMousePos({ x: 45, y: -35, glareX: 0, glareY: 0 }); // Fallback isometric tilt
     };
 
-    // Set initial isometric view on mount
     useEffect(() => {
         handleMouseLeave();
     }, []);
@@ -55,11 +44,7 @@ const Landing = () => {
     };
 
     return (
-        <div 
-            className="landing-container" 
-            onMouseMove={handleMouseMove} 
-            onMouseLeave={handleMouseLeave}
-        >
+        <div className="landing-container" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
             {/* Navbar */}
             <nav className="landing-nav">
                 <div className="logo">AlarmLog System</div>
@@ -75,10 +60,9 @@ const Landing = () => {
 
             {/* Hero Section */}
             <div className="landing-hero">
-                
                 {/* Left Side: Copy & CTA */}
                 <div className="landing-copy">
-                    <span className="badge-pill">Immersive UI Engine</span>
+                    <span className="badge-pill">Enterprise Command Center</span>
                     <h1>
                         Next-Gen Alarm &<br />
                         <span>Temperature</span> Monitoring
@@ -98,54 +82,76 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Interactive 3D Holographic Core */}
+                {/* Right Side: High-Fidelity 3D Engine */}
                 <div className="landing-3d-wrapper">
-                    
-                    {/* The primary scene that tilts based on state */}
                     <div 
                         className="scene-interactive"
-                        style={{
-                            transform: `rotateX(${mousePos.x}deg) rotateY(${mousePos.y}deg)`
-                        }}
+                        style={{ transform: `rotateX(${mousePos.x}deg) rotateY(${mousePos.y}deg)` }}
                     >
                         
-                        {/* Deep Layer (Background Context) */}
-                        <div className="core-layer layer-deep" style={{ transform: 'translateZ(-150px)' }}>
-                            <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
+                        {/* Layer 1: Microservices Node Map (Deepest Background) */}
+                        <div className="hf-layer hf-bg-map" style={{ transform: 'translateZ(-150px)' }}>
+                            <div className="ms-node ms-node-1"></div>
+                            <div className="ms-node ms-node-2"></div>
+                            <div className="ms-node ms-node-3"></div>
+                            <div className="ms-node ms-node-4"></div>
+                            <div className="ms-line ms-line-1"></div>
+                            <div className="ms-line ms-line-2"></div>
                         </div>
 
-                        {/* Base Ring Layer (Structure) */}
-                        <div className="core-layer layer-ring" style={{ transform: 'translateZ(-50px)' }}></div>
-
-                        {/* Middle Layer (Main Dashboard View) */}
-                        <div className="core-layer layer-mid" style={{ transform: 'translateZ(50px)' }}>
+                        {/* Layer 2: Main High-Fidelity Dashboard */}
+                        <div className="hf-layer hf-main-dash" style={{ transform: 'translateZ(0px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
-                            <div className="mock-header"></div>
-                            <div className="mock-grid">
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className="mock-card">
-                                        <div className={`mock-line ${i === 1 ? 'red' : 'accent'}`}></div>
-                                        <div className="mock-line short"></div>
-                                        <div className="mock-line"></div>
-                                    </div>
-                                ))}
+                            
+                            {/* Realistic Sidebar */}
+                            <div className="hf-sidebar">
+                                <div className="hf-nav-item active"></div>
+                                <div className="hf-nav-item"></div>
+                                <div className="hf-nav-item"></div>
+                            </div>
+
+                            {/* Main Content Area */}
+                            <div className="hf-content">
+                                <div style={{ height: '20px', width: '30%', background: 'var(--slate-200)', borderRadius: '4px' }}></div>
+                                
+                                <div className="hf-chart-area">
+                                    <svg width="0" height="0">
+                                        <defs>
+                                            <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
+                                                <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <svg className="hf-svg-chart" viewBox="0 0 100 50" preserveAspectRatio="none">
+                                        <path d="M0,50 L0,20 C20,10 30,40 50,20 C70,0 80,30 100,10 L100,50 Z" />
+                                        <path className="hf-chart-line" d="M0,20 C20,10 30,40 50,20 C70,0 80,30 100,10" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Top Layer (Floating Alert Context) */}
-                        <div className="core-layer layer-top" style={{ transform: 'translateZ(180px)' }}>
+                        {/* Layer 3: Live Metric Ring Widget */}
+                        <div className="hf-layer hf-widget-stat" style={{ transform: 'translateZ(100px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
-                            <div className="mock-alert-icon"></div>
-                            <div style={{ flex: 1 }}>
-                                <div className="mock-line red" style={{ width: '80%' }}></div>
-                                <div className="mock-line short"></div>
-                            </div>
+                            <svg className="hf-ring-svg" viewBox="0 0 140 140">
+                                <circle className="hf-ring-bg" cx="70" cy="70" r="60" />
+                                <circle className="hf-ring-progress" cx="70" cy="70" r="60" />
+                            </svg>
+                            <div className="hf-stat-value">68<span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>%</span></div>
+                            <div className="hf-stat-label">System Load</div>
                         </div>
 
-                        {/* Peak Layer (Floating Stat Context) */}
-                        <div className="core-layer layer-peak" style={{ transform: 'translateZ(280px)', background: 'rgba(255,255,255,0.95)' }}>
+                        {/* Layer 4: Critical Alert Radar Widget */}
+                        <div className="hf-layer hf-widget-alert" style={{ transform: 'translateZ(180px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
-                            24°
+                            <div className="hf-radar">
+                                <div className="hf-radar-dot"></div>
+                            </div>
+                            <div className="hf-alert-text">
+                                <div className="hf-alert-title">CRITICAL: SERVER_02</div>
+                                <div className="hf-alert-sub">Temperature exceeded safe threshold</div>
+                            </div>
                         </div>
 
                     </div>

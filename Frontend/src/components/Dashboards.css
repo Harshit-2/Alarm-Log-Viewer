@@ -816,3 +816,31 @@
     flex-direction: column;
   }
 }
+
+/* ============================================
+   FLOATING ICONS FOR USERS TABLE
+   ============================================ */
+.users-table-container {
+  position: relative;
+  /* Ensure floating icons don't break layout */
+  z-index: 1;
+}
+
+.floating-icon {
+  position: absolute;
+  opacity: 0.2;
+  z-index: -1;
+  pointer-events: none;
+  animation: float-icon 6s ease-in-out infinite alternate;
+}
+
+/* Specific icon placements around the table */
+.float-lock { top: -30px; left: -20px; width: 45px; height: 45px; animation-duration: 5s; transform: rotate(-15deg); color: var(--primary); }
+.float-user { bottom: -30px; right: -20px; width: 55px; height: 55px; animation-duration: 7s; animation-delay: 1s; transform: rotate(10deg); color: var(--secondary); }
+.float-file { top: 40%; right: -30px; width: 40px; height: 40px; animation-duration: 4s; animation-delay: 2s; transform: rotate(25deg); color: var(--danger); }
+.float-at { bottom: 30%; left: -30px; width: 50px; height: 50px; animation-duration: 6s; animation-delay: 0.5s; transform: rotate(-10deg); color: var(--warning); }
+
+@keyframes float-icon {
+  0% { transform: translateY(0) scale(1) rotate(inherit); }
+  100% { transform: translateY(-20px) scale(1.1) rotate(inherit); }
+}
