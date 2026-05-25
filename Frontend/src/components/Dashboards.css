@@ -263,18 +263,116 @@
   100% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
 }
 
+/* ============================================
+   STACKED ALERTS CAROUSEL
+   ============================================ */
+
+/* Stacked cards effect */
+.room-card.stacked-card {
+  position: relative;
+  z-index: 10;
+}
+
+.card-stack-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--surface-primary);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-1);
+  z-index: -1;
+  pointer-events: none;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.room-card.stacked-card .layer-1 {
+  transform: translateY(6px) scale(0.97);
+  opacity: 0.7;
+}
+
+.room-card.stacked-card .layer-2 {
+  transform: translateY(12px) scale(0.94);
+  opacity: 0.4;
+  z-index: -2;
+}
+
+.room-card.stacked-card:hover .layer-1 {
+  transform: translateY(8px) scale(0.98);
+}
+
+.room-card.stacked-card:hover .layer-2 {
+  transform: translateY(16px) scale(0.95);
+}
+
+/* Alert badge and header adjustments */
+.alert-badge-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alert-carousel-viewport {
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.carousel-btn {
+  background: var(--surface-solid);
+  border: 1px solid var(--border-muted);
+  color: var(--text-secondary);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--elevation-1);
+}
+
+.carousel-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.carousel-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-muted);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.carousel-dots .dot.active {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
 
 /* ── Technician Card ── */
 .room-card.tech-card {
-  border-left: 3px solid var(--primary);
-  border-top: none;
+  border-top: 3px solid var(--primary);
 }
 
 .room-card.tech-card:hover {
-  border-left-color: var(--primary-hover);
-  box-shadow:
-    var(--elevation-3),
-    -2px 0 12px rgba(79, 70, 229, 0.08);
+  border-top-color: var(--primary-hover);
 }
 
 

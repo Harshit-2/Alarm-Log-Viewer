@@ -1,7 +1,126 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
-import './Dashboards.css';
+import './Dashboards.css';// --- Extracted Room Card Component with Carousel Logic ---
+const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, fetchAllData }) => {
+    // Sort alerts: newest first
+    const sortedAlerts = [...alerts].sort((a, b) => new Date(b.alertTime) - new Date(a.alertTime));
+    
+    // State for carousel pagination
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const hasAlert = sortedAlerts.length > 0;
+    
+    // Reset index if alerts change and current index is out of bounds
+    useEffect(() => {
+        if (currentIndex >= sortedAlerts.length) {
+            setCurrentIndex(Math.max(0, sortedAlerts.length - 1));
+        }
+    }, [sortedAlerts.length, currentIndex]);
+
+    // The currently viewed alert determines the background and animation
+    const currentAlert = hasAlert ? sortedAlerts[currentIndex] : null;
+    const statusClass = hasAlert
+        ? (currentAlert.status === "Too Hot" ? "too-hot" : "too-cold")
+        : "safe-active";
+
+    const handlePrev = () => {
+        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : sortedAlerts.length - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) => (prev < sortedAlerts.length - 1 ? prev + 1 : 0));
+    };
+
+    return (
+        <div className={`room-card stacked-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
+            {/* The stacked visual effect if multiple alerts exist */}
+            {sortedAlerts.length > 1 && (
+                <>
+                    <div className="card-stack-layer layer-1"></div>
+                    <div className="card-stack-layer layer-2"></div>
+                </>
+            )}
+
+            <div className="room-header">
+                <h3>{room.roomName}</h3>
+                {hasAlert && (
+                    <div className="alert-badge-container">
+                        <div className="blinking-alert-indicator">
+                            <span className="pulse-red"></span> {sortedAlerts.length > 1 ? `${sortedAlerts.length} ALERTS` : 'ALERT'}
+                        </div>
+                    </div>
+                )}
+            </div>
+            
+            <div className="room-details">
+                <p><strong>ID:</strong> {room.roomId}</p>
+                <p><strong>Safe Range:</strong> {room.minTemp}°C - {room.maxTemp}°C</p>
+
+                {temperatures[room.roomId] ? (
+                    <p><strong>Latest Temp:</strong> {temperatures[room.roomId].temperatureValue}°C
+                        <span style={{ fontSize: '0.75rem', color: '#718096', marginLeft: '0.4rem' }}>
+                            at {new Date(temperatures[room.roomId].recordedAt).toLocaleTimeString()}
+                        </span>
+                    </p>
+                ) : (
+                    <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
+                )}
+
+                {/* Only display the current alert in the carousel */}
+                {hasAlert && (
+                    <div className="alert-carousel-viewport">
+                        <div key={currentAlert.alertId} className="alert-details animate-fadeIn">
+                            <p className="text-red"><strong>Status:</strong> {currentAlert.status}</p>
+                            <p className="text-red"><strong>Recorded Temp:</strong> {currentAlert.temperature}°C</p>
+                            <p className="alert-time">At: {new Date(currentAlert.alertTime).toLocaleString()}</p>
+                            
+                            {currentAlert.reason ? (
+                                <p style={{ color: '#D97706', marginTop: '0.4rem' }}>
+                                    <strong>Technician reason:</strong> {currentAlert.reason}
+                                </p>
+                            ) : (
+                                <p style={{ color: '#718096', fontSize: '0.8rem', marginTop: '0.4rem' }}>
+                                    No reason filed yet by technician.
+                                </p>
+                            )}
+
+                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                <button
+                                    className="action-btn"
+                                    style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#16A34A', color: '#16A34A', background: 'transparent' }}
+                                    onClick={() => onResolve(currentAlert)}
+                                >
+                                    Mark Resolved
+                                </button>
+                                <button
+                                    className="action-btn"
+                                    style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#E53E3E', color: '#E53E3E', background: 'transparent' }}
+                                    onClick={() => onDelete(currentAlert)}
+                                >
+                                    Delete Alert
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Pagination Controls */}
+                        {sortedAlerts.length > 1 && (
+                            <div className="carousel-controls">
+                                <button className="carousel-btn" onClick={handlePrev}>←</button>
+                                <div className="carousel-dots">
+                                    {sortedAlerts.map((_, i) => (
+                                        <span key={i} className={`dot ${i === currentIndex ? 'active' : ''}`} />
+                                    ))}
+                                </div>
+                                <button className="carousel-btn" onClick={handleNext}>→</button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+// --- End Extracted Component ---
 
 const SupervisorDashboard = () => {
     const { user: currentUser } = useAuth();
@@ -176,88 +295,34 @@ const SupervisorDashboard = () => {
                             <p>No rooms are currently registered in the system.</p>
                         </div>
                     ) : (
+
+
                         <div className="rooms-grid">
                             {rooms.map(room => {
                                 const roomAlerts = getRoomAlerts(room.roomId);
-                                const hasAlert = roomAlerts.length > 0;
-                                const latestAlert = hasAlert ? roomAlerts[roomAlerts.length - 1] : null;
-
-                                const statusClass = hasAlert
-                                    ? (latestAlert.status === "Too Hot" ? "too-hot" : "too-cold")
-                                    : "safe-active";
-
                                 return (
-                                    <div key={room.roomId} className={`room-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
-                                        <div className="room-header">
-                                            <h3>{room.roomName}</h3>
-                                            {hasAlert && (
-                                                <div className="blinking-alert-indicator">
-                                                    <span className="pulse-red"></span> ALERT
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="room-details">
-                                            <p><strong>ID:</strong> {room.roomId}</p>
-                                            <p><strong>Safe Range:</strong> {room.minTemp}°C - {room.maxTemp}°C</p>
-
-                                            {/* Show latest temperature reading from Temperature Service */}
-                                            {temperatures[room.roomId] ? (
-                                                <p><strong>Latest Temp:</strong> {temperatures[room.roomId].temperatureValue}°C
-                                                    <span style={{ fontSize: '0.75rem', color: '#718096', marginLeft: '0.4rem' }}>
-                                                        at {new Date(temperatures[room.roomId].recordedAt).toLocaleTimeString()}
-                                                    </span>
-                                                </p>
-                                            ) : (
-                                                <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
-                                            )}
-
-                                            {hasAlert && roomAlerts.map(alert => (
-                                                <div key={alert.alertId} className="alert-details">
-                                                    <p className="text-red"><strong>Status:</strong> {alert.status}</p>
-                                                    <p className="text-red"><strong>Recorded Temp:</strong> {alert.temperature}°C</p>
-                                                    <p className="alert-time">At: {new Date(alert.alertTime).toLocaleString()}</p>
-                                                    {alert.reason ? (
-                                                        <p style={{ color: '#D97706', marginTop: '0.4rem' }}>
-                                                            <strong>Technician reason:</strong> {alert.reason}
-                                                        </p>
-                                                    ) : (
-                                                        <p style={{ color: '#718096', fontSize: '0.8rem', marginTop: '0.4rem' }}>
-                                                            No reason filed yet by technician.
-                                                        </p>
-                                                    )}
-                                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-                                                        <button
-                                                            className="action-btn"
-                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#16A34A', color: '#16A34A', background: 'transparent' }}
-                                                            onClick={() => {
-                                                                setAlertToResolve(alert);
-                                                                setResolveNote('');
-                                                                setResolveError('');
-                                                                setShowResolveModal(true);
-                                                            }}
-                                                        >
-                                                            Mark Resolved
-                                                        </button>
-                                                        <button
-                                                            className="action-btn"
-                                                            style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#E53E3E', color: '#E53E3E', background: 'transparent' }}
-                                                            onClick={async () => {
-                                                                if (!window.confirm('Delete this alert permanently?')) return;
-                                                                try {
-                                                                    await apiService.deleteAlert(alert.alertId);
-                                                                    fetchAllData();
-                                                                } catch (err) {
-                                                                    setDeleteError('Failed to delete alert: ' + err.message);
-                                                                }
-                                                            }}
-                                                        >
-                                                            Delete Alert
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    <SupervisorRoomCard 
+                                        key={room.roomId}
+                                        room={room}
+                                        alerts={roomAlerts}
+                                        temperatures={temperatures}
+                                        onResolve={(alert) => {
+                                            setAlertToResolve(alert);
+                                            setResolveNote('');
+                                            setResolveError('');
+                                            setShowResolveModal(true);
+                                        }}
+                                        onDelete={async (alert) => {
+                                            if (!window.confirm('Delete this alert permanently?')) return;
+                                            try {
+                                                await apiService.deleteAlert(alert.alertId);
+                                                fetchAllData();
+                                            } catch (err) {
+                                                setDeleteError('Failed to delete alert: ' + err.message);
+                                            }
+                                        }}
+                                        fetchAllData={fetchAllData}
+                                    />
                                 );
                             })}
                         </div>
