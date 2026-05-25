@@ -15,6 +15,29 @@ const Register = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
 
+    const calculateStrength = (pwd) => {
+        let score = 0;
+        if (pwd.length >= 6) score += 1;
+        if (/[A-Z]/.test(pwd)) score += 1;
+        if (/[a-z]/.test(pwd)) score += 1;
+        if (/[0-9]/.test(pwd)) score += 1;
+        if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+        return score; // 0 to 5
+    };
+
+    const strength = calculateStrength(password);
+    const isPasswordValid = strength === 5;
+
+    // Determine bar color based on strength
+    const getStrengthColor = () => {
+        if (strength <= 1) return '#E53E3E'; // Red
+        if (strength === 2) return '#DD6B20'; // Orange
+        if (strength === 3) return '#D69E2E'; // Yellow
+        if (strength === 4) return '#38A169'; // Light green
+        if (strength === 5) return '#16A34A'; // Green
+        return '#E2E8F0';
+    };
+
     const validateForm = () => {
         if (!fullName || !email || !password || !confirmPassword) {
             setError('Please fill in all fields');
@@ -27,8 +50,8 @@ const Register = () => {
             return false;
         }
 
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters long');
+        if (!isPasswordValid) {
+            setError('Password must be at least 6 characters, contain 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
             return false;
         }
 
@@ -104,6 +127,23 @@ const Register = () => {
                             placeholder="Create a password"
                             required
                         />
+                        {/* Password Strength Indicator */}
+                        {password.length > 0 && (
+                            <div className="password-strength-wrapper">
+                                <div className="password-strength-bar-bg">
+                                    <div 
+                                        className="password-strength-bar-fill" 
+                                        style={{ 
+                                            width: `${(strength / 5) * 100}%`,
+                                            backgroundColor: getStrengthColor()
+                                        }}
+                                    ></div>
+                                </div>
+                                <p className="password-rules-text" style={{ color: isPasswordValid ? '#16A34A' : '#718096' }}>
+                                    {isPasswordValid ? '✅ Strong Password' : 'Requires: 6+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special symbol.'}
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -135,7 +175,7 @@ const Register = () => {
                     <button 
                         type="submit" 
                         className={`auth-button ${loading ? 'loading' : ''}`}
-                        disabled={loading}
+                        disabled={loading || (password.length > 0 && !isPasswordValid)}
                     >
                         {loading ? 'Creating Account...' : 'Sign Up'}
                     </button>
