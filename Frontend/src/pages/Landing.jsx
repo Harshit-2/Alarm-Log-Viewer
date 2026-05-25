@@ -35,7 +35,7 @@ const Landing = () => {
 
     const handleGetStarted = () => {
         if (user) navigate('/dashboard');
-        else navigate('/register');
+        else navigate('/login');
     };
 
     const handleLogin = () => {
