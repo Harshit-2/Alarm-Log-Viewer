@@ -135,6 +135,7 @@ const SupervisorDashboard = () => {
     const [rooms, setRooms] = useState([]);
     const [alerts, setAlerts] = useState([]);
     const [users, setUsers] = useState([]);
+    const [activityLogs, setActivityLogs] = useState([]);
     const [temperatures, setTemperatures] = useState({}); // Map of roomId -> latest temp reading
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -188,6 +189,15 @@ const SupervisorDashboard = () => {
         } catch (err) {
             newWarnings.push('⚠️ User Service is unavailable: ' + err.message);
             setUsers([]);
+        }
+
+        // Fetch Activity Logs — optional
+        try {
+            const logsData = await apiService.getActivityLogs();
+            setActivityLogs(logsData || []);
+        } catch (err) {
+            newWarnings.push('⚠️ Alert Service (Logs) is unavailable: ' + err.message);
+            setActivityLogs([]);
         }
 
         // Fetch Temperatures for each room — using Promise.allSettled so one
@@ -263,6 +273,12 @@ const SupervisorDashboard = () => {
                             onClick={() => setActiveTab('users')}
                         >
                             Users
+                        </button>
+                        <button
+                            className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('logs')}
+                        >
+                            Logs
                         </button>
                     </div>
                     <div className="status-badge">
@@ -372,6 +388,36 @@ const SupervisorDashboard = () => {
                                     </tr>
                                 ))}
                             </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {activeTab === 'logs' && (
+                <div className="users-management">
+                    <h3>Activity Logs</h3>
+                    {activityLogs.length === 0 ? (
+                        <p>No activity logs found.</p>
+                    ) : (
+                        <div className="users-table-container">
+                            <table className="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {activityLogs.map(log => (
+                                        <tr key={log.logId}>
+                                            <td>{new Date(log.timestamp).toLocaleString()}</td>
+                                            <td><span className="role-badge Supervisor">{log.action}</span></td>
+                                            <td>{log.details}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
                         </div>
                     )}

@@ -34,6 +34,23 @@ namespace AlarmLogViewerAPI.Controllers
             return Ok(alerts);
         }
 
+        // GET all activity logs
+        [HttpGet("logs")]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult> GetLogs()
+        {
+            try
+            {
+                var logs = await alertRepo.GetLogsAsync();
+                return Ok(logs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to fetch activity logs: {Error}", ex.Message);
+                return BadRequest("Failed to fetch logs");
+            }
+        }
+
 
 
         // GET all alerts for a specific room

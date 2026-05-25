@@ -10,6 +10,7 @@ namespace AlertsLibrary.Repos
         Task<Alert> GetByAlertIdAsync(string id);
         Task<List<Alert>> GetAllAlertsAsync();
         Task<List<Alert>> GetByRoomIdAsync(string roomId);
+        Task<List<ActivityLog>> GetLogsAsync();
 
         Task AddAsync(Alert alert);
         Task UpdateAlertAsync(string id, Alert alert);

@@ -30,6 +30,12 @@ namespace AlertsLibrary.Repos
             return alerts;
         }
 
+        public async Task<List<ActivityLog>> GetLogsAsync()
+        {
+            // Fetch logs and order by most recent first
+            return await context.ActivityLogs.OrderByDescending(log => log.Timestamp).ToListAsync();
+        }
+
         public async Task<Alert> GetByAlertIdAsync(string id)
         {
             Alert alert = await context.Alerts.FirstOrDefaultAsync(x => x.AlertId == id);

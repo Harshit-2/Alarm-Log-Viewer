@@ -80,6 +80,7 @@ export const apiService = {
     // Alerts
     getAlerts: () => fetchWithAuth('/alertSvc'),
     getAlertsByRoom: (roomId) => fetchWithAuth(`/alertSvc/room/${roomId}`),
+    getActivityLogs: () => fetchWithAuth('/alertSvc/logs'),
     createAlert: (alert) => fetchWithAuth('/alertSvc', {
         method: 'POST',
         body: JSON.stringify(alert)
