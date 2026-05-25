@@ -331,8 +331,8 @@
   border: 1px solid var(--border-muted);
   color: var(--text-secondary);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,10 +341,20 @@
   box-shadow: var(--elevation-1);
 }
 
+.carousel-btn svg {
+  transition: stroke var(--duration-fast) var(--ease-out);
+}
+
 .carousel-btn:hover {
-  background: var(--primary);
-  color: white;
+  background: var(--surface-primary);
+  color: var(--primary);
   border-color: var(--primary);
+  box-shadow: var(--elevation-2);
+  transform: translateY(-1px);
+}
+
+.carousel-btn:active {
+  transform: translateY(0);
 }
 
 .carousel-dots {
