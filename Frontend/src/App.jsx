@@ -10,6 +10,23 @@ import Dashboard from './pages/Dashboard';
 function App() {
   return (
     <AuthProvider>
+      {/* Cinematic Data Flow Background — Global Layer */}
+      <div className="ambient-bg">
+        {/* Infinite Panning Grid */}
+        <div className="tech-grid-layer"></div>
+        
+        {/* Sweeping Light Beams */}
+        <div className="scanner-beam scanner-beam-1"></div>
+        <div className="scanner-beam scanner-beam-2"></div>
+        
+        {/* Floating Data Nodes */}
+        <div className="data-node node-1"></div>
+        <div className="data-node node-2"></div>
+        <div className="data-node node-3"></div>
+        <div className="data-node node-4"></div>
+        <div className="data-node node-5"></div>
+      </div>
+
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />

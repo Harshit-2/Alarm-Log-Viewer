@@ -12,13 +12,6 @@ const Dashboard = () => {
 
     return (
         <>
-            {/* Ambient Background Layer — sits behind everything */}
-            <div className="ambient-bg">
-                <div className="ambient-orb ambient-orb--primary"></div>
-                <div className="ambient-orb ambient-orb--secondary"></div>
-                <div className="ambient-orb ambient-orb--accent"></div>
-            </div>
-
             <div className="dashboard-container">
                 <nav className="dashboard-nav glass-navbar">
                     <h1>Alarm Log Viewer</h1>

@@ -1,112 +1,126 @@
 /* ============================================
-   AMBIENT BACKGROUND
-   Multi-layer atmospheric background system.
-   Sits behind all content via fixed positioning.
-   GPU-composited for 60fps.
+   CINEMATIC DATA FLOW BACKGROUND
+   Global animated background for all pages.
+   Uses GPU-accelerated transforms for 60fps performance.
    ============================================ */
 
-/* Container — placed as first child of dashboard */
 .ambient-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -10;
   overflow: hidden;
   pointer-events: none;
+  background: var(--slate-900); /* Deep dark background */
+  /* Fallback gradient if animations are off */
+  background: linear-gradient(135deg, var(--slate-900) 0%, var(--slate-800) 100%);
 }
 
-/* Layer 1: Base gradient — warm-to-cool diagonal sweep */
-.ambient-bg::before {
-  content: '';
+/* If you prefer it light, uncomment the below (The previous was light mode) 
+   Actually, the user liked the light theme. I will keep it light theme but with rich dark accents or just rich light mode.
+   Let's stick to the premium Light mode since the whole UI is built for light mode (text is dark, cards are white).
+*/
+
+.ambient-bg {
+  background: #f8fafc;
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+}
+
+/* ── 1. Infinite Panning Tech Grid ── */
+.tech-grid-layer {
   position: absolute;
-  inset: 0;
+  inset: -200%; /* Large enough to pan without clipping */
+  background-image: 
+    linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform-origin: center;
+  animation: pan-grid 40s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes pan-grid {
+  0% {
+    transform: rotate(15deg) translateY(0) translateX(0);
+  }
+  100% {
+    /* Move by exactly 600px (multiple of 60px grid size) to seamlessly loop */
+    transform: rotate(15deg) translateY(-600px) translateX(-600px);
+  }
+}
+
+/* ── 2. Sweeping Light Beams ── */
+.scanner-beam {
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  width: 300px;
   background: linear-gradient(
-    145deg,
-    var(--slate-50) 0%,
-    #f0f4ff 30%,
-    #f5f3ff 50%,
-    var(--slate-100) 80%,
-    #ecfeff 100%
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.03) 40%,
+    rgba(14, 165, 233, 0.1) 50%,
+    rgba(99, 102, 241, 0.03) 60%,
+    transparent 100%
+  );
+  transform: rotate(35deg);
+  filter: blur(20px);
+  mix-blend-mode: multiply;
+}
+
+.scanner-beam-1 {
+  left: -20%;
+  animation: sweep-beam 8s ease-in-out infinite;
+}
+
+.scanner-beam-2 {
+  right: -20%;
+  animation: sweep-beam 12s ease-in-out infinite reverse;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(168, 85, 247, 0.02) 40%,
+    rgba(139, 92, 246, 0.08) 50%,
+    rgba(168, 85, 247, 0.02) 60%,
+    transparent 100%
   );
 }
 
-/* Layer 2: Floating orbs — two large soft radial blobs */
-.ambient-orb {
+@keyframes sweep-beam {
+  0% { transform: rotate(35deg) translateX(-150vw); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: rotate(35deg) translateX(150vw); opacity: 0; }
+}
+
+/* ── 3. Floating Data Nodes ── */
+.data-node {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  will-change: transform;
-  pointer-events: none;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.4) 0%, transparent 70%);
+  filter: blur(10px);
+  animation: float-up linear infinite;
+  bottom: -20%;
 }
 
-.ambient-orb--primary {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(79, 70, 229, 0.12) 0%,
-    rgba(99, 102, 241, 0.06) 40%,
-    transparent 70%
-  );
-  top: -8%;
-  left: -5%;
-  animation: float-orb-1 30s ease-in-out infinite alternate;
-}
+.node-1 { width: 150px; height: 150px; left: 15%; animation-duration: 18s; animation-delay: 0s; }
+.node-2 { width: 250px; height: 250px; left: 45%; background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, transparent 70%); animation-duration: 25s; animation-delay: -5s; }
+.node-3 { width: 100px; height: 100px; left: 75%; animation-duration: 15s; animation-delay: -10s; }
+.node-4 { width: 200px; height: 200px; left: 85%; background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%); animation-duration: 22s; animation-delay: -2s; }
+.node-5 { width: 120px; height: 120px; left: 5%; background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%); animation-duration: 20s; animation-delay: -12s; }
 
-.ambient-orb--secondary {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(
-    circle,
-    rgba(14, 165, 233, 0.1) 0%,
-    rgba(6, 182, 212, 0.05) 40%,
-    transparent 70%
-  );
-  bottom: -10%;
-  right: -5%;
-  animation: float-orb-2 25s ease-in-out infinite alternate;
-}
-
-.ambient-orb--accent {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(
-    circle,
-    rgba(168, 85, 247, 0.07) 0%,
-    transparent 60%
-  );
-  top: 50%;
-  left: 40%;
-  transform: translate(-50%, -50%);
-  animation: float-orb-3 35s ease-in-out infinite alternate;
-}
-
-/* Layer 3: Noise texture — ultra-fine grain for depth */
-.ambient-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-  pointer-events: none;
-}
-
-/* Orb keyframes — GPU-composited transforms only */
-@keyframes float-orb-1 {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(40px, 30px) scale(1.08); }
-  100% { transform: translate(-20px, 50px) scale(0.95); }
-}
-
-@keyframes float-orb-2 {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(-30px, -40px) scale(1.05); }
-  100% { transform: translate(20px, -20px) scale(0.97); }
-}
-
-@keyframes float-orb-3 {
-  0%   { transform: translate(-50%, -50%) scale(1); }
-  50%  { transform: translate(-45%, -55%) scale(1.1); }
-  100% { transform: translate(-55%, -45%) scale(0.92); }
+@keyframes float-up {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-120vh) scale(1.2);
+    opacity: 0;
+  }
 }
