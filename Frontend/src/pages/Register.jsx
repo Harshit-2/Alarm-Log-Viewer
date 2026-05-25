@@ -17,24 +17,23 @@ const Register = () => {
 
     const calculateStrength = (pwd) => {
         let score = 0;
-        if (pwd.length >= 6) score += 1;
-        if (/[A-Z]/.test(pwd)) score += 1;
         if (/[a-z]/.test(pwd)) score += 1;
+        if (/[A-Z]/.test(pwd)) score += 1;
         if (/[0-9]/.test(pwd)) score += 1;
         if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
-        return score; // 0 to 5
+        return score; // 0 to 4
     };
 
     const strength = calculateStrength(password);
-    const isPasswordValid = strength === 5;
+    // Valid if it meets the 4 conditions AND is at least 6 characters
+    const isPasswordValid = strength === 4 && password.length >= 6;
 
-    // Determine bar color based on strength
+    // Determine bar color based on strength (4 stages)
     const getStrengthColor = () => {
         if (strength <= 1) return '#E53E3E'; // Red
         if (strength === 2) return '#DD6B20'; // Orange
         if (strength === 3) return '#D69E2E'; // Yellow
         if (strength === 4) return '#38A169'; // Light green
-        if (strength === 5) return '#16A34A'; // Green
         return '#E2E8F0';
     };
 
@@ -134,12 +133,12 @@ const Register = () => {
                                     <div 
                                         className="password-strength-bar-fill" 
                                         style={{ 
-                                            width: `${(strength / 5) * 100}%`,
+                                            width: `${(strength / 4) * 100}%`,
                                             backgroundColor: getStrengthColor()
                                         }}
                                     ></div>
                                 </div>
-                                <p className="password-rules-text" style={{ color: isPasswordValid ? '#16A34A' : '#718096' }}>
+                                <p className="password-rules-text" style={{ color: isPasswordValid ? '#38A169' : '#718096' }}>
                                     {isPasswordValid ? '✅ Strong Password' : 'Requires: 6+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special symbol.'}
                                 </p>
                             </div>
