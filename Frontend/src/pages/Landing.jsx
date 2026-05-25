@@ -48,14 +48,7 @@ const Landing = () => {
             {/* Navbar */}
             <nav className="landing-nav">
                 <div className="logo">AlarmLog System</div>
-                <div>
-                    <button className="cancel-btn" onClick={handleLogin} style={{ marginRight: '1rem', border: 'none', pointerEvents: 'auto' }}>
-                        {user ? 'Go to Dashboard' : 'Sign In'}
-                    </button>
-                    <button className="primary-btn" onClick={handleGetStarted} style={{ pointerEvents: 'auto' }}>
-                        Get Started
-                    </button>
-                </div>
+                {/* Removed redundant nav buttons per user request */}
             </nav>
 
             {/* Hero Section */}
@@ -73,11 +66,8 @@ const Landing = () => {
                         Detect anomalies before they become emergencies.
                     </p>
                     <div className="landing-actions">
-                        <button className="primary-btn" onClick={handleGetStarted} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-                            Start Monitoring
-                        </button>
-                        <button className="cancel-btn" onClick={handleLogin} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-                            View Demo
+                        <button className="primary-btn" onClick={handleGetStarted} style={{ padding: '1rem 2.5rem', fontSize: '1.2rem', pointerEvents: 'auto' }}>
+                            {user ? 'Go to Dashboard →' : 'Get Started →'}
                         </button>
                     </div>
                 </div>
@@ -138,8 +128,8 @@ const Landing = () => {
                                 <circle className="hf-ring-bg" cx="70" cy="70" r="60" />
                                 <circle className="hf-ring-progress" cx="70" cy="70" r="60" />
                             </svg>
-                            <div className="hf-stat-value">68<span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>%</span></div>
-                            <div className="hf-stat-label">System Load</div>
+                            <div className="hf-stat-value">24<span style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>°C</span></div>
+                            <div className="hf-stat-label">Average Temp</div>
                         </div>
 
                         {/* Layer 4: Critical Alert Radar Widget */}
