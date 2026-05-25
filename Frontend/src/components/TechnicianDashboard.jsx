@@ -248,7 +248,7 @@ const TechnicianDashboard = ({ userId }) => {
                     {displayedRooms.map(room => {
                         const activeAlert = getActiveAlert(room.roomId);
                         return (
-                        <div key={room.roomId} className="room-card safe-active">
+                        <div key={room.roomId} className="room-card tech-card">
                             <div className="room-header">
                                 <h3>{room.roomName}</h3>
                                 <span className="room-id">{room.roomId}</span>
@@ -265,8 +265,8 @@ const TechnicianDashboard = ({ userId }) => {
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
                                 <button 
-                                    className="action-btn"
-                                    style={{ marginTop: 0, flex: 1 }}
+                                    className="primary-btn"
+                                    style={{ marginTop: 0, flex: 1, padding: '0.6rem' }}
                                     onClick={() => {
                                         setSelectedRoom(room);
                                         setShowTempModal(true);

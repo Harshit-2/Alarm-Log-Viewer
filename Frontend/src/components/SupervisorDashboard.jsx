@@ -211,29 +211,26 @@ const SupervisorDashboard = () => {
                                                 <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
                                             )}
 
-                                            {hasAlert && (
-                                                <div className="alert-details">
-                                                    <p className="text-red"><strong>Status:</strong> {latestAlert.status}</p>
-                                                    <p className="text-red"><strong>Recorded Temp:</strong> {latestAlert.temperature}°C</p>
-                                                    <p className="alert-time">At: {new Date(latestAlert.alertTime).toLocaleString()}</p>
-                                                    {/* Show the reason filed by the technician */}
-                                                    {latestAlert.reason ? (
+                                            {hasAlert && roomAlerts.map(alert => (
+                                                <div key={alert.alertId} className="alert-details">
+                                                    <p className="text-red"><strong>Status:</strong> {alert.status}</p>
+                                                    <p className="text-red"><strong>Recorded Temp:</strong> {alert.temperature}°C</p>
+                                                    <p className="alert-time">At: {new Date(alert.alertTime).toLocaleString()}</p>
+                                                    {alert.reason ? (
                                                         <p style={{ color: '#D97706', marginTop: '0.4rem' }}>
-                                                            <strong>Technician reason:</strong> {latestAlert.reason}
+                                                            <strong>Technician reason:</strong> {alert.reason}
                                                         </p>
                                                     ) : (
                                                         <p style={{ color: '#718096', fontSize: '0.8rem', marginTop: '0.4rem' }}>
                                                             No reason filed yet by technician.
                                                         </p>
                                                     )}
-                                                    {/* Supervisor actions */}
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                                                         <button
                                                             className="action-btn"
                                                             style={{ flex: 1, marginTop: 0, fontSize: '0.8rem', padding: '0.5rem', borderColor: '#16A34A', color: '#16A34A', background: 'transparent' }}
                                                             onClick={() => {
-                                                                // Open the resolve modal instead of directly resolving
-                                                                setAlertToResolve(latestAlert);
+                                                                setAlertToResolve(alert);
                                                                 setResolveNote('');
                                                                 setResolveError('');
                                                                 setShowResolveModal(true);
@@ -247,7 +244,7 @@ const SupervisorDashboard = () => {
                                                             onClick={async () => {
                                                                 if (!window.confirm('Delete this alert permanently?')) return;
                                                                 try {
-                                                                    await apiService.deleteAlert(latestAlert.alertId);
+                                                                    await apiService.deleteAlert(alert.alertId);
                                                                     fetchAllData();
                                                                 } catch (err) {
                                                                     setDeleteError('Failed to delete alert: ' + err.message);
@@ -258,7 +255,7 @@ const SupervisorDashboard = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                            )}
+                                            ))}
                                         </div>
                                     </div>
                                 );

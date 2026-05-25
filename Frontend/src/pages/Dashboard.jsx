@@ -15,7 +15,7 @@ const Dashboard = () => {
             <nav className="dashboard-nav">
                 <h1>Alarm Log Viewer</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <span style={{ color: '#5C7CFA', fontWeight: '600' }}>
+                    <span style={{ color: 'var(--primary)', fontWeight: '600' }}>
                         {user?.username} ({user?.role})
                     </span>
                     <button onClick={logout} className="logout-btn">
