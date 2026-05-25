@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import TechnicianDashboard from '../components/TechnicianDashboard';
 import SupervisorDashboard from '../components/SupervisorDashboard';
@@ -11,29 +11,40 @@ const Dashboard = () => {
     const role = user?.role;
 
     return (
-        <div className="dashboard-container">
-            <nav className="dashboard-nav">
-                <h1>Alarm Log Viewer</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <span style={{ color: 'var(--primary)', fontWeight: '600' }}>
-                        {user?.username} ({user?.role})
-                    </span>
-                    <button onClick={logout} className="logout-btn">
-                        Logout
-                    </button>
-                </div>
-            </nav>
+        <>
+            {/* Ambient Background Layer — sits behind everything */}
+            <div className="ambient-bg">
+                <div className="ambient-orb ambient-orb--primary"></div>
+                <div className="ambient-orb ambient-orb--secondary"></div>
+                <div className="ambient-orb ambient-orb--accent"></div>
+            </div>
 
-            <main className="dashboard-content">
-                {role === 'Admin' ? (
-                    <AdminDashboard />
-                ) : role === 'Supervisor' ? (
-                    <SupervisorDashboard />
-                ) : (
-                    <TechnicianDashboard userId={user?.userId} />
-                )}
-            </main>
-        </div>
+            <div className="dashboard-container">
+                <nav className="dashboard-nav glass-navbar">
+                    <h1>Alarm Log Viewer</h1>
+                    <div className="nav-user-info">
+                        <div className="nav-user-meta">
+                            <span className="nav-user-name">{user?.username}</span>
+                            <span className={`nav-role-pill ${user?.role}`}>{user?.role}</span>
+                        </div>
+                        <div className="nav-divider"></div>
+                        <button onClick={logout} className="logout-btn">
+                            Logout
+                        </button>
+                    </div>
+                </nav>
+
+                <main className="dashboard-content">
+                    {role === 'Admin' ? (
+                        <AdminDashboard />
+                    ) : role === 'Supervisor' ? (
+                        <SupervisorDashboard />
+                    ) : (
+                        <TechnicianDashboard userId={user?.userId} />
+                    )}
+                </main>
+            </div>
+        </>
     );
 };
 

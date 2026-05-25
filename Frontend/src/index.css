@@ -1,10 +1,14 @@
+/* Design System Imports */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import './styles/tokens.css';
+@import './styles/ambient.css';
+@import './styles/glass.css';
+@import './styles/animations.css';
 
 :root {
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-  --bg-gradient: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-solid: #FFFFFF;
+
+  /* Core palette — referenced by components */
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --secondary: #0ea5e9;
@@ -13,12 +17,14 @@
   --danger: #ef4444;
   --success: #10b981;
   --warning: #f59e0b;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
-  
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-solid: #FFFFFF;
+
+  /* Legacy compat — some components still reference these */
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-lg: var(--elevation-3);
+  --shadow-hover: var(--elevation-4);
   --glass-border: 1px solid rgba(255, 255, 255, 0.6);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 }
@@ -27,42 +33,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: #f8fafc;
-  /* Tech Grid Overlay */
-  background-image: 
-    linear-gradient(rgba(79, 70, 229, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(79, 70, 229, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center center;
-  background-attachment: fixed;
+  background-color: var(--slate-50);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* The Cinematic Aurora */
-body::before {
-  content: '';
-  position: fixed;
-  top: -50%; right: -50%; bottom: -50%; left: -50%;
-  z-index: -1;
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.18), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.15), transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.15), transparent 40%),
-    radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.12), transparent 40%);
-  filter: blur(80px);
-  animation: aurora-shift 25s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-@keyframes aurora-shift {
-  0% { transform: rotate(0deg) scale(1); }
-  33% { transform: rotate(5deg) scale(1.1) translate(2%, 2%); }
-  66% { transform: rotate(-3deg) scale(0.9) translate(-2%, 5%); }
-  100% { transform: rotate(0deg) scale(1) translate(0, 0); }
 }
 
 * {
