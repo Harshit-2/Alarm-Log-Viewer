@@ -398,7 +398,7 @@ const TechnicianDashboard = ({ userId }) => {
             {showReasonModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h3>📋 File Reason for Alert</h3>
+                        <h3>File Reason for Alert</h3>
                         <p className="modal-subtitle">
                             Room alert: <strong>{alertForReason?.status}</strong> at {alertForReason?.temperature}°C
                         </p>
@@ -420,7 +420,7 @@ const TechnicianDashboard = ({ userId }) => {
                                     <option value="External heat source">External heat source</option>
                                     <option value="Human error">Human error</option>
                                     <option value="Under investigation">Under investigation</option>
-                                    <option value="Other">Other (see notes below)</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div className="modal-actions">
