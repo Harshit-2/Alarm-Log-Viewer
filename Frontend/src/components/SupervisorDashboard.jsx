@@ -410,13 +410,22 @@ const SupervisorDashboard = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {activityLogs.map(log => (
-                                        <tr key={log.logId}>
-                                            <td>{new Date(log.timestamp).toLocaleString()}</td>
-                                            <td><span className="role-badge Supervisor">{log.action}</span></td>
-                                            <td>{log.details}</td>
-                                        </tr>
-                                    ))}
+                                    {activityLogs.map(log => {
+                                        let roleClass = 'Admin'; // Default (orange) for System/Alert Created
+                                        if (log.action.includes('Technician')) {
+                                            roleClass = 'Technician';
+                                        } else if (log.action.includes('Supervisor')) {
+                                            roleClass = 'Supervisor';
+                                        }
+
+                                        return (
+                                            <tr key={log.logId}>
+                                                <td>{new Date(log.timestamp).toLocaleString()}</td>
+                                                <td><span className={`role-badge ${roleClass}`}>{log.action}</span></td>
+                                                <td>{log.details}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
