@@ -162,9 +162,34 @@
 
 .room-card.safe-active {
   border-top: 4px solid var(--success);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(220, 252, 231, 0.6) 100%);
 }
 .room-card.safe-active:hover {
   border-color: var(--success);
+}
+
+.room-card.safe-active::before {
+  content: '🌿 🍃';
+  position: absolute;
+  top: 5%;
+  right: -5%;
+  font-size: 3.5rem;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+  animation: sway-leaves 4s ease-in-out infinite alternate;
+}
+
+.room-card.safe-active::after {
+  content: '✨';
+  position: absolute;
+  bottom: 15%;
+  left: 5%;
+  font-size: 2.5rem;
+  opacity: 0.6;
+  z-index: 0;
+  pointer-events: none;
+  animation: sparkle-safe 3s ease-in-out infinite alternate;
 }
 
 /* Too Hot State */
@@ -246,6 +271,16 @@
 }
 
 /* Room Card Emoji Keyframes (PRESERVED) */
+@keyframes sway-leaves {
+  0% { transform: rotate(0deg) translateY(0); }
+  100% { transform: rotate(15deg) translateY(-10px); }
+}
+
+@keyframes sparkle-safe {
+  0% { transform: scale(0.8) rotate(0deg); opacity: 0.3; }
+  100% { transform: scale(1.2) rotate(20deg); opacity: 0.8; }
+}
+
 @keyframes drift-cloud {
   0% { transform: translateX(0); }
   100% { transform: translateX(20px); }
