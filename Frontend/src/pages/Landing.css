@@ -1,0 +1,292 @@
+/* ============================================
+   LANDING PAGE — 3D ISOMETRIC ANIMATIONS
+   ============================================ */
+
+/* ── Hero Container ── */
+.landing-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+  position: relative;
+  z-index: 1; /* Above ambient bg */
+}
+
+/* ── Left Content (Copy) ── */
+.landing-copy {
+  flex: 1;
+  max-width: 540px;
+  animation: slideUp 0.8s var(--ease-out) forwards;
+}
+
+.badge-pill {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-6);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.15);
+}
+
+.landing-copy h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-main);
+  margin: 0 0 var(--space-6) 0;
+  letter-spacing: -1.5px;
+}
+
+.landing-copy h1 span {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-copy p {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-8);
+}
+
+.landing-actions {
+  display: flex;
+  gap: var(--space-4);
+}
+
+/* ── Right Content (3D Animation Wrapper) ── */
+.landing-3d-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Crucial for 3D depth */
+  perspective: 1200px;
+  height: 600px;
+}
+
+/* ── The 3D Scene ── */
+.scene-3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  /* Base isometric tilt */
+  transform: rotateX(60deg) rotateZ(-45deg);
+  /* The gentle floating animation */
+  animation: float-3d 6s ease-in-out infinite alternate;
+}
+
+@keyframes float-3d {
+  0% { transform: rotateX(55deg) rotateZ(-40deg) translateY(0); }
+  100% { transform: rotateX(60deg) rotateZ(-45deg) translateY(-30px); }
+}
+
+/* ── The 3D Cards / Layers ── */
+.glass-layer-3d {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  height: 240px;
+  margin-top: -120px;
+  margin-left: -190px;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    -20px 20px 60px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--ease-out);
+}
+
+/* Base Card (Main Dashboard Mockup) */
+.layer-base {
+  transform: translateZ(0);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.85) 100%);
+}
+
+.mock-header {
+  height: 20px;
+  width: 40%;
+  background: var(--slate-200);
+  border-radius: 4px;
+  margin-bottom: var(--space-4);
+}
+
+.mock-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.mock-card {
+  background: white;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mock-line {
+  height: 8px;
+  background: var(--slate-100);
+  border-radius: 4px;
+}
+
+.mock-line.short { width: 50%; }
+.mock-line.accent { background: rgba(79, 70, 229, 0.2); }
+.mock-line.red { background: rgba(239, 68, 68, 0.2); }
+
+/* Floating Card 1 (Alert Widget) */
+.layer-float-1 {
+  width: 200px;
+  height: 120px;
+  margin-top: -160px;
+  margin-left: 20px;
+  transform: translateZ(80px); /* Floats 80px above base */
+  background: rgba(255, 255, 255, 0.9);
+  border-top: 4px solid var(--danger);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  animation: bob-1 4s ease-in-out infinite alternate;
+}
+
+.layer-float-1 .mock-alert-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid var(--danger);
+  position: relative;
+}
+
+.layer-float-1 .mock-alert-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px; height: 6px;
+  background: var(--danger);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--danger);
+}
+
+/* Floating Card 2 (Temp Stats Widget) */
+.layer-float-2 {
+  width: 160px;
+  height: 140px;
+  margin-top: 40px;
+  margin-left: -120px;
+  transform: translateZ(120px); /* Floats highest */
+  background: rgba(255, 255, 255, 0.9);
+  border-left: 4px solid var(--primary);
+  padding: var(--space-4);
+  animation: bob-2 5s ease-in-out infinite alternate-reverse;
+}
+
+.layer-float-2 .mock-stat {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-top: var(--space-2);
+}
+
+/* ── 3D Bobbing Animations ── */
+@keyframes bob-1 {
+  0% { transform: translateZ(70px); }
+  100% { transform: translateZ(100px); }
+}
+
+@keyframes bob-2 {
+  0% { transform: translateZ(110px); }
+  100% { transform: translateZ(140px); }
+}
+
+/* ── Floor Shadow ── */
+.floor-shadow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 400px; height: 260px;
+  margin-top: -130px; margin-left: -200px;
+  background: rgba(0, 0, 0, 0.08);
+  filter: blur(24px);
+  transform: translateZ(-100px); /* Below the base card */
+  border-radius: var(--radius-xl);
+}
+
+/* ── Top Navbar ── */
+.landing-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.landing-nav .logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.landing-nav .logo::before {
+  content: '';
+  width: 12px; height: 12px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--primary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .landing-hero {
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 120px;
+    text-align: center;
+  }
+  .landing-copy h1 { font-size: 3rem; }
+  .landing-actions { justify-content: center; }
+  .landing-3d-wrapper {
+    margin-top: 40px;
+    height: 400px;
+  }
+  .scene-3d {
+    transform: rotateX(50deg) rotateZ(-30deg) scale(0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-copy h1 { font-size: 2.5rem; }
+  .scene-3d {
+    transform: rotateX(50deg) rotateZ(-30deg) scale(0.6);
+  }
+}

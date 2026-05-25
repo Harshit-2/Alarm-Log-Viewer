@@ -236,7 +236,7 @@
 .room-card.too-hot::after {
   content: '🌴 🐪 🌵';
   position: absolute;
-  bottom: 0;
+  bottom: -20px;
   left: 5%;
   font-size: 3rem;
   opacity: 0.6;
