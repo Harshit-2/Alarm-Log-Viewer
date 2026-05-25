@@ -155,7 +155,7 @@
     top: 5%;
     left: -10%;
     font-size: 4rem;
-    opacity: 0.15;
+    opacity: 0.6;
     letter-spacing: 40px;
     z-index: 0;
     pointer-events: none;
@@ -168,7 +168,7 @@
     top: -20%;
     left: 10%;
     font-size: 1.5rem;
-    opacity: 0.2;
+    opacity: 0.8;
     letter-spacing: 30px;
     z-index: 0;
     pointer-events: none;
@@ -182,7 +182,7 @@
     top: -5%;
     right: -5%;
     font-size: 5rem;
-    opacity: 0.12;
+    opacity: 0.6;
     z-index: 0;
     pointer-events: none;
     animation: pulse-sun 4s infinite alternate;
@@ -194,7 +194,7 @@
     bottom: -5%;
     left: 5%;
     font-size: 3rem;
-    opacity: 0.12;
+    opacity: 0.6;
     letter-spacing: 20px;
     z-index: 0;
     pointer-events: none;
@@ -215,8 +215,8 @@
 }
 
 @keyframes pulse-sun {
-    0% { transform: scale(1) rotate(0deg); opacity: 0.08; }
-    100% { transform: scale(1.1) rotate(5deg); opacity: 0.15; }
+    0% { transform: scale(1) rotate(0deg); opacity: 0.4; }
+    100% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
 }
 
 @keyframes drift-desert {
