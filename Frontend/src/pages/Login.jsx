@@ -13,7 +13,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Determine where to redirect after login
+    
     const from = location.state?.from?.pathname || '/dashboard';
 
     const handleSubmit = async (e) => {

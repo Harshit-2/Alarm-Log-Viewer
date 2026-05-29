@@ -21,7 +21,7 @@ namespace RoomsLibrary.Models
 
         [Column(TypeName = "VARCHAR(6)")]
         [ForeignKey("userNavigation")]
-        public string CreatedByUserId { get; set; } // UserId reference
+        public string CreatedByUserId { get; set; } 
 
         [Column(TypeName = "VARCHAR(30)")]
         public string CreatedAt { get; set; }

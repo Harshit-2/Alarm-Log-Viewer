@@ -52,7 +52,7 @@ namespace RoomsLibrary.Repos
                 {
                     throw new RoomException("Room not found");
                 }
-                //existingRoom.RoomId = room.RoomId;
+                
                 existingRoom.RoomName = room.RoomName;
                 existingRoom.MinTemp = room.MinTemp;
                 existingRoom.MaxTemp = room.MaxTemp;

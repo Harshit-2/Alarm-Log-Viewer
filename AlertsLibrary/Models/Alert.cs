@@ -25,12 +25,12 @@ namespace AlertsLibrary.Models
         [Column(TypeName = "VARCHAR(30)")]
         public string AlertTime { get; set; }
 
-        // Reason filed by the technician explaining why the temperature went out of range
+        
         [Column(TypeName = "VARCHAR(200)")]
         public string? Reason { get; set; }
 
-        // Resolution note written by the supervisor when they mark the alert as Resolved
-        // They describe what the issue was and what steps they took to fix it
+        
+        
         [Column(TypeName = "VARCHAR(500)")]
         public string? ResolutionNote { get; set; }
     }

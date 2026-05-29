@@ -1,6 +1,4 @@
-/* ============================================
-   LANDING PAGE — HIGH-FIDELITY 3D COMMAND CENTER
-   ============================================ */
+
 
 .landing-container {
   min-height: 100vh;
@@ -93,7 +91,7 @@
   gap: var(--space-4);
 }
 
-/* ── 3D Engine ── */
+
 .landing-3d-wrapper {
   flex: 1;
   display: flex;
@@ -120,7 +118,7 @@
   overflow: hidden;
 }
 
-/* ── Layer 1: Background Microservices Map ── */
+
 .hf-bg-map {
   width: 600px; height: 400px;
   margin-top: -200px; margin-left: -300px;
@@ -155,7 +153,7 @@
   100% { transform: scale(1.5); opacity: 1; }
 }
 
-/* ── Layer 2: Main Dashboard (High Fidelity) ── */
+
 .hf-main-dash {
   width: 560px; height: 340px;
   margin-top: -170px; margin-left: -280px;
@@ -199,7 +197,7 @@
   padding: var(--space-3);
 }
 
-/* The SVG gradient chart simulating live data */
+
 .hf-svg-chart {
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -212,7 +210,7 @@
   fill: none;
 }
 
-/* ── Layer 3: Live Metric Widget (Circular Ring) ── */
+
 .hf-widget-stat {
   width: 160px; height: 160px;
   margin-top: -20px; margin-left: 180px;
@@ -250,7 +248,7 @@
   100% { stroke-dashoffset: 140; }
 }
 
-/* ── Layer 4: Critical Alert Widget (Pulsing Radar) ── */
+
 .hf-widget-alert {
   width: 260px; height: 80px;
   margin-top: 80px; margin-left: -220px;
@@ -288,7 +286,7 @@
 .hf-alert-title { font-weight: 700; color: var(--danger); font-size: 0.95rem; }
 .hf-alert-sub { font-size: 0.8rem; color: var(--text-secondary); }
 
-/* ── Dynamic Glare ── */
+
 .glare {
   position: absolute;
   top: -100%; left: -100%; right: -100%; bottom: -100%;

@@ -1,14 +1,14 @@
 const GATEWAY_URL = 'http://localhost:5065';
 const SECRET_KEY = 'I am Bond, James Bond. I am the best spy in the world. I am invincible.';
 
-// Simple helper for generating a random user ID for the C# backend which expects VARCHAR(6)
+
 const generateUserId = () => {
-    return 'U' + Math.floor(10000 + Math.random() * 90000); // e.g. U12345
+    return 'U' + Math.floor(10000 + Math.random() * 90000); 
 };
 
 export const authService = {
     async login(email, password) {
-        // 1. Verify credentials with User API
+        
         let userRes;
         try {
             userRes = await fetch(`${GATEWAY_URL}/userSvc/credentials?username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
@@ -22,7 +22,7 @@ export const authService = {
         
         const userData = await userRes.json();
         
-        // 2. Get JWT Token from Auth API
+        
         let authRes;
         try {
             authRes = await fetch(`${GATEWAY_URL}/authSvc/${encodeURIComponent(userData.username)}/${encodeURIComponent(userData.role)}/${encodeURIComponent(SECRET_KEY)}`);

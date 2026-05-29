@@ -7,7 +7,7 @@ const Landing = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    // State for interactive 3D rotations and glare tracking
+    
     const [mousePos, setMousePos] = useState({ x: 0, y: 0, glareX: 0, glareY: 0 });
 
     const handleMouseMove = (e) => {
@@ -15,7 +15,7 @@ const Landing = () => {
         const centerY = window.innerHeight / 2;
         const xNormalized = (e.clientX - centerX) / centerX;
         const yNormalized = (e.clientY - centerY) / centerY;
-        const maxTilt = 20; // Slightly reduced for a heavier, premium feel
+        const maxTilt = 20; 
         
         setMousePos({
             x: -yNormalized * maxTilt,
@@ -26,7 +26,7 @@ const Landing = () => {
     };
 
     const handleMouseLeave = () => {
-        setMousePos({ x: 45, y: -35, glareX: 0, glareY: 0 }); // Fallback isometric tilt
+        setMousePos({ x: 45, y: -35, glareX: 0, glareY: 0 }); 
     };
 
     useEffect(() => {
@@ -45,15 +45,15 @@ const Landing = () => {
 
     return (
         <div className="landing-container" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-            {/* Navbar */}
+            {}
             <nav className="landing-nav">
                 <div className="logo">AlarmLog System</div>
-                {/* Removed redundant nav buttons per user request */}
+                {}
             </nav>
 
-            {/* Hero Section */}
+            {}
             <div className="landing-hero">
-                {/* Left Side: Copy & CTA */}
+                {}
                 <div className="landing-copy">
                     <span className="badge-pill">Enterprise Command Center</span>
                     <h1>
@@ -72,14 +72,14 @@ const Landing = () => {
                     </div>
                 </div>
 
-                {/* Right Side: High-Fidelity 3D Engine */}
+                {}
                 <div className="landing-3d-wrapper">
                     <div 
                         className="scene-interactive"
                         style={{ transform: `rotateX(${mousePos.x}deg) rotateY(${mousePos.y}deg)` }}
                     >
                         
-                        {/* Layer 1: Microservices Node Map (Deepest Background) */}
+                        {}
                         <div className="hf-layer hf-bg-map" style={{ transform: 'translateZ(-150px)' }}>
                             <div className="ms-node ms-node-1"></div>
                             <div className="ms-node ms-node-2"></div>
@@ -89,18 +89,18 @@ const Landing = () => {
                             <div className="ms-line ms-line-2"></div>
                         </div>
 
-                        {/* Layer 2: Main High-Fidelity Dashboard */}
+                        {}
                         <div className="hf-layer hf-main-dash" style={{ transform: 'translateZ(0px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
                             
-                            {/* Realistic Sidebar */}
+                            {}
                             <div className="hf-sidebar">
                                 <div className="hf-nav-item active"></div>
                                 <div className="hf-nav-item"></div>
                                 <div className="hf-nav-item"></div>
                             </div>
 
-                            {/* Main Content Area */}
+                            {}
                             <div className="hf-content">
                                 <div style={{ height: '20px', width: '30%', background: 'var(--slate-200)', borderRadius: '4px' }}></div>
                                 
@@ -121,7 +121,7 @@ const Landing = () => {
                             </div>
                         </div>
 
-                        {/* Layer 3: Live Metric Ring Widget */}
+                        {}
                         <div className="hf-layer hf-widget-stat" style={{ transform: 'translateZ(100px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
                             <svg className="hf-ring-svg" viewBox="0 0 140 140">
@@ -132,7 +132,7 @@ const Landing = () => {
                             <div className="hf-stat-label">Average Temp</div>
                         </div>
 
-                        {/* Layer 4: Critical Alert Radar Widget */}
+                        {}
                         <div className="hf-layer hf-widget-alert" style={{ transform: 'translateZ(180px)' }}>
                             <div className="glare" style={{ transform: `translate(${mousePos.glareX}%, ${mousePos.glareY}%)` }}></div>
                             <div className="hf-radar">

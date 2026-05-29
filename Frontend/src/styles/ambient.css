@@ -1,8 +1,4 @@
-/* ============================================
-   CINEMATIC DATA FLOW BACKGROUND
-   Global animated background for all pages.
-   Uses GPU-accelerated transforms for 60fps performance.
-   ============================================ */
+
 
 .ambient-bg {
   position: fixed;
@@ -10,25 +6,22 @@
   z-index: -10;
   overflow: hidden;
   pointer-events: none;
-  background: var(--slate-900); /* Deep dark background */
-  /* Fallback gradient if animations are off */
+  background: var(--slate-900); 
+  
   background: linear-gradient(135deg, var(--slate-900) 0%, var(--slate-800) 100%);
 }
 
-/* If you prefer it light, uncomment the below (The previous was light mode) 
-   Actually, the user liked the light theme. I will keep it light theme but with rich dark accents or just rich light mode.
-   Let's stick to the premium Light mode since the whole UI is built for light mode (text is dark, cards are white).
-*/
+
 
 .ambient-bg {
   background: #f8fafc;
   background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
 }
 
-/* ── 1. Infinite Panning Tech Grid ── */
+
 .tech-grid-layer {
   position: absolute;
-  inset: -200%; /* Large enough to pan without clipping */
+  inset: -200%; 
   background-image: 
     linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
@@ -43,12 +36,12 @@
     transform: rotate(15deg) translateY(0) translateX(0);
   }
   100% {
-    /* Move by exactly 600px (multiple of 60px grid size) to seamlessly loop */
+    
     transform: rotate(15deg) translateY(-600px) translateX(-600px);
   }
 }
 
-/* ── 2. Sweeping Light Beams ── */
+
 .scanner-beam {
   position: absolute;
   top: -50%;
@@ -92,7 +85,7 @@
   100% { transform: rotate(35deg) translateX(150vw); opacity: 0; }
 }
 
-/* ── 3. Floating Data Nodes ── */
+
 .data-node {
   position: absolute;
   border-radius: 50%;

@@ -1,8 +1,4 @@
-/* ============================================
-   GLASSMORPHISM UTILITIES
-   Controlled, reusable glass panel classes.
-   Light usage — not heavy blur.
-   ============================================ */
+
 
 .glass-panel {
   background: var(--surface-primary);
@@ -39,7 +35,7 @@
   box-shadow: var(--elevation-3);
 }
 
-/* Glass overlay for modals */
+
 .glass-overlay {
   background: var(--surface-overlay);
   backdrop-filter: blur(6px);

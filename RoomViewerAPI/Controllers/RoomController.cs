@@ -8,12 +8,12 @@ namespace RoomViewerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    
     public class RoomController : ControllerBase
     {
         private readonly IRoomRepository roomRepo;
 
-        // ILogger writes messages to the console so developers can see what is happening
+        
         private readonly ILogger<RoomController> _logger;
 
         public RoomController(IRoomRepository roomRepository, ILogger<RoomController> logger)
@@ -42,7 +42,7 @@ namespace RoomViewerAPI.Controllers
             {
                 await roomRepo.AddAsync(room);
 
-                // Log room creation to console
+                
                 _logger.LogInformation(
                     "ROOM CREATED — RoomId: {RoomId}, Name: {Name}, MinTemp: {Min}°C, MaxTemp: {Max}°C, CreatedBy: {UserId}",
                     room.RoomId, room.RoomName, room.MinTemp, room.MaxTemp, room.CreatedByUserId);

@@ -26,7 +26,7 @@ const fetchWithAuth = async (url, options = {}) => {
             headers
         });
     } catch (networkError) {
-        // This happens when the server is completely unreachable (e.g. backend is offline)
+        
         throw new Error('Cannot connect to the server. Please make sure all backend services are running.');
     }
 
@@ -39,12 +39,12 @@ const fetchWithAuth = async (url, options = {}) => {
     try {
         return JSON.parse(text);
     } catch {
-        return text; // Return plain text if not JSON
+        return text; 
     }
 };
 
 export const apiService = {
-    // Users
+    
     getUsers: () => fetchWithAuth('/userSvc'),
     getUser: (id) => fetchWithAuth(`/userSvc/${id}`),
     updateUser: (id, user) => fetchWithAuth(`/userSvc/${id}`, {
@@ -55,7 +55,7 @@ export const apiService = {
         method: 'DELETE'
     }),
 
-    // Rooms
+    
     getRooms: () => fetchWithAuth('/roomSvc'),
     getRoom: (id) => fetchWithAuth(`/roomSvc/${id}`),
     createRoom: (room) => fetchWithAuth('/roomSvc', {
@@ -70,14 +70,14 @@ export const apiService = {
         method: 'DELETE'
     }),
 
-    // Temperatures
+    
     getTemperaturesByRoom: (roomId) => fetchWithAuth(`/temperatureSvc/room/${roomId}`),
     setTemperature: (temperature) => fetchWithAuth('/temperatureSvc', {
         method: 'POST',
         body: JSON.stringify(temperature)
     }),
 
-    // Alerts
+    
     getAlerts: () => fetchWithAuth('/alertSvc'),
     getAlertsByRoom: (roomId) => fetchWithAuth(`/alertSvc/room/${roomId}`),
     getActivityLogs: () => fetchWithAuth('/alertSvc/logs'),

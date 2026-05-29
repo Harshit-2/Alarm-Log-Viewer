@@ -22,19 +22,19 @@ const Register = () => {
         if (/[A-Z]/.test(pwd)) score += 1;
         if (/[0-9]/.test(pwd)) score += 1;
         if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
-        return score; // 0 to 4
+        return score; 
     };
 
     const strength = calculateStrength(password);
-    // Valid if it meets the 4 conditions AND is at least 6 characters
+    
     const isPasswordValid = strength === 4 && password.length >= 6;
 
-    // Determine bar color based on strength (4 stages)
+    
     const getStrengthColor = () => {
-        if (strength <= 1) return '#E53E3E'; // Red
-        if (strength === 2) return '#DD6B20'; // Orange
-        if (strength === 3) return '#D69E2E'; // Yellow
-        if (strength === 4) return '#38A169'; // Light green
+        if (strength <= 1) return '#E53E3E'; 
+        if (strength === 2) return '#DD6B20'; 
+        if (strength === 3) return '#D69E2E'; 
+        if (strength === 4) return '#38A169'; 
         return '#E2E8F0';
     };
 
@@ -78,7 +78,7 @@ const Register = () => {
 
         try {
             await register(fullName, email, password, role, adminKey);
-            // Registration automatically logs in, so we redirect to dashboard
+            
             navigate('/dashboard', { replace: true });
         } catch (err) {
             setError(err.message || 'Failed to create an account. Please try again.');
@@ -132,7 +132,7 @@ const Register = () => {
                             placeholder="Create a password"
                             required
                         />
-                        {/* Password Strength Indicator */}
+                        {}
                         {password.length > 0 && (
                             <div className="password-strength-wrapper">
                                 <div className="password-strength-bar-bg">

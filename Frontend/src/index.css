@@ -1,4 +1,4 @@
-/* Design System Imports */
+
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import './styles/tokens.css';
 @import './styles/ambient.css';
@@ -8,7 +8,7 @@
 :root {
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
 
-  /* Core palette — referenced by components */
+  
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --secondary: #0ea5e9;
@@ -20,7 +20,7 @@
   --surface: rgba(255, 255, 255, 0.85);
   --surface-solid: #FFFFFF;
 
-  /* Legacy compat — some components still reference these */
+  
   --shadow-sm: var(--elevation-1);
   --shadow-md: var(--elevation-2);
   --shadow-lg: var(--elevation-3);

@@ -17,7 +17,7 @@ namespace AlertsLibrary.Repos
         Task DeleteAsync(string id);
         Task AddRoomStubAsync(Room room);
 
-        // Saves a log entry to the database with the action name, details, and current timestamp
+        
         Task LogActivityAsync(string action, string details);
 
 

@@ -15,7 +15,7 @@ namespace TemperatureLibrary.Models
 
         [Column(TypeName = "VARCHAR(6)")]
         [ForeignKey("RoomNavigation")]
-        public string RoomId { get; set; } // Reference to Room
+        public string RoomId { get; set; } 
 
         public virtual Room? RoomNavigation { get; set; }
 

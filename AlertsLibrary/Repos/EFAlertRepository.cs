@@ -32,7 +32,7 @@ namespace AlertsLibrary.Repos
 
         public async Task<List<ActivityLog>> GetLogsAsync()
         {
-            // Fetch logs and order by most recent first
+            
             return await context.ActivityLogs.OrderByDescending(log => log.Timestamp).ToListAsync();
         }
 
@@ -58,13 +58,13 @@ namespace AlertsLibrary.Repos
                     throw new AlertException("No alert found with the given ID");
                 }
 
-                // Update fields
+                
                 existingAlert.RoomId = alert.RoomId;
                 existingAlert.Temperature = alert.Temperature;
                 existingAlert.Status = alert.Status;
                 existingAlert.AlertTime = alert.AlertTime;
-                existingAlert.Reason = alert.Reason; // Save the technician's filed reason
-                existingAlert.ResolutionNote = alert.ResolutionNote; // Save the supervisor's resolution note
+                existingAlert.Reason = alert.Reason; 
+                existingAlert.ResolutionNote = alert.ResolutionNote; 
 
                 await context.SaveChangesAsync();
             }
@@ -115,15 +115,15 @@ namespace AlertsLibrary.Repos
             }
         }
 
-        // Saves a log entry to the ActivityLogs table in the database
-        // Call this whenever a technician or supervisor does something important
+        
+        
         public async Task LogActivityAsync(string action, string details)
         {
             var log = new ActivityLog
             {
                 Action = action,
                 Details = details,
-                Timestamp = DateTime.Now  // Current date and time
+                Timestamp = DateTime.Now  
             };
             await context.ActivityLogs.AddAsync(log);
             await context.SaveChangesAsync();

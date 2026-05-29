@@ -7,12 +7,12 @@ namespace TemperatureWebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    
     public class TemperatureController : ControllerBase
     {
         private readonly ITemperatureRepository _repository;
 
-        // ILogger writes messages to the console so developers can see what is happening
+        
         private readonly ILogger<TemperatureController> _logger;
 
         public TemperatureController(ITemperatureRepository repository, ILogger<TemperatureController> logger)
@@ -33,7 +33,7 @@ namespace TemperatureWebApi.Controllers
             }
             catch (TemperatureException)
             {
-                // No temperatures recorded for this room yet — return empty list instead of error
+                
                 return Ok(new List<Temperature>());
             }
         }
@@ -45,7 +45,7 @@ namespace TemperatureWebApi.Controllers
         {
             await _repository.AddAsync(temperature);
 
-            // Log temperature recording to console
+            
             _logger.LogInformation(
                 "TEMPERATURE RECORDED — ReadingId: {Id}, RoomId: {RoomId}, Value: {Temp}°C",
                 temperature.ReadingId, temperature.RoomId, temperature.TemperatureValue);

@@ -4,25 +4,25 @@ import './Dashboards.css';
 
 const TechnicianDashboard = ({ userId }) => {
     const [rooms, setRooms] = useState([]);
-    const [allAlerts, setAllAlerts] = useState([]); // All alerts for all rooms
+    const [allAlerts, setAllAlerts] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [newRoom, setNewRoom] = useState({ id: null, name: '', minTemp: 0, maxTemp: 100 });
-    const [viewMode, setViewMode] = useState('all'); // 'all' or 'mine'
-    const [modalError, setModalError] = useState(''); // Error shown inside Create/Edit modal
+    const [viewMode, setViewMode] = useState('all'); 
+    const [modalError, setModalError] = useState(''); 
 
-    // Set Temp Modal State
+    
     const [showTempModal, setShowTempModal] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [tempValue, setTempValue] = useState('');
-    const [tempError, setTempError] = useState(''); // Error shown inside Set Temp modal
+    const [tempError, setTempError] = useState(''); 
 
-    // File Reason Modal State
+    
     const [showReasonModal, setShowReasonModal] = useState(false);
-    const [alertForReason, setAlertForReason] = useState(null); // The alert being explained
+    const [alertForReason, setAlertForReason] = useState(null); 
     const [reasonValue, setReasonValue] = useState('');
     const [reasonError, setReasonError] = useState('');
 
@@ -31,7 +31,7 @@ const TechnicianDashboard = ({ userId }) => {
 
         const interval = setInterval(() => {
             fetchData();
-        }, 50000); // Refresh data every 50 seconds to keep alerts up-to-date
+        }, 50000); 
         return () => clearInterval(interval);
     }, []);
 
@@ -47,24 +47,24 @@ const TechnicianDashboard = ({ userId }) => {
             const alertData = await apiService.getAlerts();
             setAllAlerts(alertData || []);
         } catch {
-            // Alerts not critical — rooms still show even if alert fetch fails
+            
         }
         setLoading(false);
     };
 
-    // Returns the latest ACTIVE (unresolved) alert for a given room, or null
+    
     const getActiveAlert = (roomId) => {
         return allAlerts.find(a => a.roomId === roomId && a.status !== 'Resolved') || null;
     };
 
     const handleCreateOrUpdateRoom = async (e) => {
         e.preventDefault();
-        setModalError(''); // Clear any previous error
+        setModalError(''); 
 
-        // Validate: max temperature must be greater than min temperature
+        
         if (parseFloat(newRoom.maxTemp) <= parseFloat(newRoom.minTemp)) {
             setModalError('Maximum temperature must be greater than minimum temperature.');
-            return; // Stop here — do not call the API
+            return; 
         }
 
         try {
@@ -78,7 +78,7 @@ const TechnicianDashboard = ({ userId }) => {
                     createdAt: new Date().toISOString().split('T')[0]
                 });
             } else {
-                const roomId = 'R' + Math.floor(10000 + Math.random() * 90000); // Generate R12345
+                const roomId = 'R' + Math.floor(10000 + Math.random() * 90000); 
                 await apiService.createRoom({
                     roomId: roomId,
                     roomName: newRoom.name,
@@ -92,9 +92,9 @@ const TechnicianDashboard = ({ userId }) => {
             setNewRoom({ id: null, name: '', minTemp: 0, maxTemp: 100 });
             setIsEditing(false);
             setModalError('');
-            fetchData(); // Refresh the list
+            fetchData(); 
         } catch (err) {
-            // Show error inside the modal instead of a browser alert popup
+            
             setModalError(`Failed to ${isEditing ? 'update' : 'create'} room: ` + err.message);
         }
     };
@@ -102,7 +102,7 @@ const TechnicianDashboard = ({ userId }) => {
     const handleDeleteRoom = async (roomId) => {
         if (!window.confirm('Are you sure you want to delete this room? This cannot be undone.')) return;
         try {
-            // First, clean up all alerts associated with this room
+            
             try {
                 const roomAlerts = await apiService.getAlertsByRoom(roomId);
                 if (roomAlerts && roomAlerts.length > 0) {
@@ -111,18 +111,18 @@ const TechnicianDashboard = ({ userId }) => {
                     }
                 }
             } catch {
-                // If alert cleanup fails, still proceed with room deletion
+                
             }
 
             await apiService.deleteRoom(roomId);
             fetchData();
         } catch (err) {
-            // Show the delete error in the main error banner (no modal is open during delete)
+            
             setError('Failed to delete room: ' + err.message);
         }
     };
 
-    // Handles filing a reason for an active alert
+    
     const handleFileReason = async (e) => {
         e.preventDefault();
         setReasonError('');
@@ -133,7 +133,7 @@ const TechnicianDashboard = ({ userId }) => {
             });
             setShowReasonModal(false);
             setReasonValue('');
-            fetchData(); // Refresh so the filed reason appears
+            fetchData(); 
         } catch (err) {
             setReasonError('Failed to file reason: ' + err.message);
         }
@@ -141,11 +141,11 @@ const TechnicianDashboard = ({ userId }) => {
 
     const handleSetTemperature = async (e) => {
         e.preventDefault();
-        setTempError(''); // Clear any previous error
+        setTempError(''); 
         try {
             const tempVal = parseFloat(tempValue);
             
-            // 1. Save Temperature Reading
+            
             const readingId = 'T' + Math.floor(10000 + Math.random() * 90000);
             await apiService.setTemperature({
                 readingId: readingId,
@@ -154,9 +154,9 @@ const TechnicianDashboard = ({ userId }) => {
                 recordedAt: new Date().toISOString()
             });
 
-            // 2. Check if it violates min/max bounds
+            
             if (tempVal < selectedRoom.minTemp || tempVal > selectedRoom.maxTemp) {
-                // Temperature is OUT OF RANGE — create a new alert
+                
                 const alertId = 'A' + Math.floor(10000 + Math.random() * 90000);
                 const status = tempVal < selectedRoom.minTemp ? "Too Cold" : "Too Hot";
                 
@@ -169,14 +169,14 @@ const TechnicianDashboard = ({ userId }) => {
                 });
                 alert(`⚠️ Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
             } else {
-                // Temperature is BACK IN RANGE — resolve any existing alerts for this room
+                
                 try {
                     const roomAlerts = await apiService.getAlertsByRoom(selectedRoom.roomId);
                     
-                    // Update each unresolved alert to "Resolved" status
+                    
                     if (roomAlerts && roomAlerts.length > 0) {
                         for (const existingAlert of roomAlerts) {
-                            // Only resolve alerts that are not already resolved
+                            
                             if (existingAlert.status !== "Resolved") {
                                 await apiService.updateAlert(existingAlert.alertId, {
                                     ...existingAlert,
@@ -186,7 +186,7 @@ const TechnicianDashboard = ({ userId }) => {
                         }
                     }
                 } catch {
-                    // If fetching/updating alerts fails, it's not critical — temp was still saved
+                    
                 }
                 alert('✅ Temperature recorded successfully. All systems normal.');
             }
@@ -196,7 +196,7 @@ const TechnicianDashboard = ({ userId }) => {
             setTempError('');
             fetchData();
         } catch (err) {
-            // Show error inside the modal instead of a browser alert popup
+            
             setTempError('Failed to record temperature: ' + err.message);
         }
     };
@@ -256,7 +256,7 @@ const TechnicianDashboard = ({ userId }) => {
                             <div className="room-details">
                                 <p><strong>Min Temp:</strong> {room.minTemp}°C</p>
                                 <p><strong>Max Temp:</strong> {room.maxTemp}°C</p>
-                                {/* Show if a reason has already been filed for an active alert */}
+                                {}
                                 {activeAlert && activeAlert.reason && (
                                     <p style={{ color: '#D97706', fontSize: '0.85rem', marginTop: '0.5rem' }}>
                                         <strong>Reason filed:</strong> {activeAlert.reason}
@@ -296,7 +296,7 @@ const TechnicianDashboard = ({ userId }) => {
                                         </button>
                                     </>
                                 )}
-                                {/* File Reason button — only shown when there is an active (unresolved) alert */}
+                                {}
                                 {activeAlert && (
                                     <button
                                         className="action-btn"
@@ -318,12 +318,12 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             )}
 
-            {/* Create Room Modal */}
+            {}
             {showCreateModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>{isEditing ? 'Edit Room' : 'Create a New Room'}</h3>
-                        {/* Show error inside the modal so the user sees it without the modal closing */}
+                        {}
                         {modalError && <div className="error-message" style={{ marginBottom: '1rem' }}>{modalError}</div>}
                         <form onSubmit={handleCreateOrUpdateRoom}>
                             <div className="form-group">
@@ -365,13 +365,13 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             )}
 
-            {/* Set Temperature Modal */}
+            {}
             {showTempModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <h3>Set Temperature for {selectedRoom?.roomName}</h3>
                         <p className="modal-subtitle">Safe range: {selectedRoom?.minTemp}°C - {selectedRoom?.maxTemp}°C</p>
-                        {/* Show error inside the modal so the user sees it without the modal closing */}
+                        {}
                         {tempError && <div className="error-message" style={{ marginBottom: '1rem' }}>{tempError}</div>}
                         <form onSubmit={handleSetTemperature}>
                             <div className="form-group">
@@ -394,7 +394,7 @@ const TechnicianDashboard = ({ userId }) => {
                 </div>
             )}
 
-            {/* File Reason Modal — appears when technician clicks "File Reason" on a room with an active alert */}
+            {}
             {showReasonModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">

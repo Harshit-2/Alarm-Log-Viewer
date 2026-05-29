@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
-import './Dashboards.css';// --- Extracted Room Card Component with Carousel Logic ---
+import './Dashboards.css';
 const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, fetchAllData }) => {
-    // Sort alerts: newest first
+    
     const sortedAlerts = [...alerts].sort((a, b) => new Date(b.alertTime) - new Date(a.alertTime));
     
-    // State for carousel pagination
+    
     const [currentIndex, setCurrentIndex] = useState(0);
     const hasAlert = sortedAlerts.length > 0;
     
-    // Reset index if alerts change and current index is out of bounds
+    
     useEffect(() => {
         if (currentIndex >= sortedAlerts.length) {
             setCurrentIndex(Math.max(0, sortedAlerts.length - 1));
         }
     }, [sortedAlerts.length, currentIndex]);
 
-    // The currently viewed alert determines the background and animation
+    
     const currentAlert = hasAlert ? sortedAlerts[currentIndex] : null;
     const statusClass = hasAlert
         ? (currentAlert.status === "Too Hot" ? "too-hot" : "too-cold")
@@ -33,7 +33,7 @@ const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, f
 
     return (
         <div className={`room-card stacked-card ${hasAlert ? 'alert-active' : ''} ${statusClass}`}>
-            {/* The stacked visual effect if multiple alerts exist */}
+            {}
             {sortedAlerts.length > 1 && (
                 <>
                     <div className="card-stack-layer layer-1"></div>
@@ -66,7 +66,7 @@ const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, f
                     <p style={{ color: '#718096', fontSize: '0.85rem' }}>No temperature recorded yet</p>
                 )}
 
-                {/* Only display the current alert in the carousel */}
+                {}
                 {hasAlert && (
                     <div className="alert-carousel-viewport">
                         <div key={currentAlert.alertId} className="alert-details animate-fadeIn">
@@ -102,7 +102,7 @@ const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, f
                             </div>
                         </div>
 
-                        {/* Pagination Controls */}
+                        {}
                         {sortedAlerts.length > 1 && (
                             <div className="carousel-controls">
                                 <button className="carousel-btn" onClick={handlePrev} aria-label="Previous alert">
@@ -128,7 +128,7 @@ const SupervisorRoomCard = ({ room, alerts, temperatures, onResolve, onDelete, f
         </div>
     );
 };
-// --- End Extracted Component ---
+
 
 const SupervisorDashboard = () => {
     const { user: currentUser } = useAuth();
@@ -136,23 +136,23 @@ const SupervisorDashboard = () => {
     const [alerts, setAlerts] = useState([]);
     const [users, setUsers] = useState([]);
     const [activityLogs, setActivityLogs] = useState([]);
-    const [temperatures, setTemperatures] = useState({}); // Map of roomId -> latest temp reading
+    const [temperatures, setTemperatures] = useState({}); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [deleteError, setDeleteError] = useState(''); // Error shown when deleting a user fails
-    const [warnings, setWarnings] = useState([]); // Tracks which services failed
-    const [activeTab, setActiveTab] = useState('monitoring'); // 'monitoring' | 'users'
+    const [deleteError, setDeleteError] = useState(''); 
+    const [warnings, setWarnings] = useState([]); 
+    const [activeTab, setActiveTab] = useState('monitoring'); 
 
-    // Resolve Alert Modal state
+    
     const [showResolveModal, setShowResolveModal] = useState(false);
-    const [alertToResolve, setAlertToResolve] = useState(null); // Which alert is being resolved
-    const [resolveNote, setResolveNote] = useState('');          // Supervisor's resolution note
+    const [alertToResolve, setAlertToResolve] = useState(null); 
+    const [resolveNote, setResolveNote] = useState('');          
     const [resolveError, setResolveError] = useState('');
 
     useEffect(() => {
         fetchAllData();
 
-        // Polling for updates every 5 seconds to see new alerts dynamically
+        
         const interval = setInterval(() => {
             fetchAllData();
         }, 5000);
@@ -164,7 +164,7 @@ const SupervisorDashboard = () => {
         const newWarnings = [];
         let fetchedRooms = [];
 
-        // Fetch Rooms — required for monitoring
+        
         try {
             fetchedRooms = await apiService.getRooms() || [];
             setRooms(fetchedRooms);
@@ -173,7 +173,7 @@ const SupervisorDashboard = () => {
             setRooms([]);
         }
 
-        // Fetch Alerts — optional, dashboard still works without them
+        
         try {
             const alertsData = await apiService.getAlerts();
             setAlerts(alertsData || []);
@@ -182,7 +182,7 @@ const SupervisorDashboard = () => {
             setAlerts([]);
         }
 
-        // Fetch Users — optional, dashboard still works without them
+        
         try {
             const usersData = await apiService.getUsers();
             setUsers(usersData || []);
@@ -191,7 +191,7 @@ const SupervisorDashboard = () => {
             setUsers([]);
         }
 
-        // Fetch Activity Logs — optional
+        
         try {
             const logsData = await apiService.getActivityLogs();
             setActivityLogs(logsData || []);
@@ -200,16 +200,16 @@ const SupervisorDashboard = () => {
             setActivityLogs([]);
         }
 
-        // Fetch Temperatures for each room — using Promise.allSettled so one
-        // room with no data doesn't crash the rest
+        
+        
         if (fetchedRooms.length > 0) {
-            // Promise.allSettled waits for ALL fetches to finish,
-            // whether they succeed or fail — no crash!
+            
+            
             const tempResults = await Promise.allSettled(
                 fetchedRooms.map(room => apiService.getTemperaturesByRoom(room.roomId))
             );
 
-            // Build a map: roomId -> latest temperature reading
+            
             const tempMap = {};
             let failedCount = 0;
 
@@ -217,41 +217,41 @@ const SupervisorDashboard = () => {
                 const result = tempResults[index];
 
                 if (result.status === 'fulfilled') {
-                    // ✅ Success — store the latest reading if any exist
+                    
                     const readings = result.value;
                     if (readings && readings.length > 0) {
                         tempMap[room.roomId] = readings[readings.length - 1];
                     }
-                    // If readings is empty [], that just means no temp recorded yet — totally fine
+                    
                 } else {
-                    // ❌ This room's fetch failed (no data or service error)
+                    
                     failedCount++;
                 }
             });
 
             setTemperatures(tempMap);
 
-            // Only warn if ALL rooms failed — that means the service is truly down
-            // If only some failed, it just means those rooms have no temperature data yet
+            
+            
             if (failedCount === fetchedRooms.length) {
                 newWarnings.push('⚠️ Temperature Service is unavailable: ' + tempResults[0].reason?.message);
             }
         }
 
         setWarnings(newWarnings);
-        setError(''); // Clear any old global error
+        setError(''); 
         setLoading(false);
     };
 
     if (loading && rooms.length === 0) return <div className="loading-state">Loading global monitoring dashboard...</div>;
 
-    // Helper to find if a room has ACTIVE (unresolved) alerts
-    // Alerts with status "Resolved" are ignored — the room is back to normal
+    
+    
     const getRoomAlerts = (roomId) => {
         return alerts.filter(a => a.roomId === roomId && a.status !== "Resolved");
     };
 
-    // Count only active (unresolved) alerts for rooms that still exist
+    
     const activeAlerts = alerts.filter(a =>
         a.status !== "Resolved" && rooms.some(r => r.roomId === a.roomId)
     );
@@ -287,7 +287,7 @@ const SupervisorDashboard = () => {
                 </div>
             </div>
 
-            {/* Show individual service warnings */}
+            {}
             {warnings.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
                     {warnings.map((msg, index) => (
@@ -357,13 +357,13 @@ const SupervisorDashboard = () => {
             {activeTab === 'users' && (
                 <div className="users-management">
                     <h3>User Management</h3>
-                    {/* Show delete error inline instead of a browser popup */}
+                    {}
                     {deleteError && <div className="error-message" style={{ marginBottom: '1rem' }}>{deleteError}</div>}
                     {users.length === 0 ? (
                         <p>No users found.</p>
                     ) : (
                         <div className="users-table-container">
-                            {/* Floating Decorative Icons */}
+                            {}
                             <svg className="floating-icon float-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             <svg className="floating-icon float-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             <svg className="floating-icon float-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -411,7 +411,7 @@ const SupervisorDashboard = () => {
                                 </thead>
                                 <tbody>
                                     {activityLogs.map(log => {
-                                        let roleClass = 'Admin'; // Default (orange) for System/Alert Created
+                                        let roleClass = 'Admin'; 
                                         if (log.action.includes('Technician')) {
                                             roleClass = 'Technician';
                                         } else if (log.action.includes('Supervisor')) {
@@ -433,7 +433,7 @@ const SupervisorDashboard = () => {
                 </div>
             )}
 
-            {/* Resolve Alert Modal — supervisor writes what steps they took to fix the issue */}
+            {}
             {showResolveModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">

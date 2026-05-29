@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in on mount
+        
         const storedUser = authService.getUser();
         const storedToken = authService.getToken();
         
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (fullName, email, password, role, adminKey) => {
         await authService.register(fullName, email, password, role, adminKey);
-        // Automatically log in after successful registration
+        
         return await login(email, password);
     };
 
