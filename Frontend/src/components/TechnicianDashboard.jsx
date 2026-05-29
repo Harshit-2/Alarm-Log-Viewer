@@ -104,12 +104,7 @@ const TechnicianDashboard = ({ userId }) => {
         try {
             
             try {
-                const roomAlerts = await apiService.getAlertsByRoom(roomId);
-                if (roomAlerts && roomAlerts.length > 0) {
-                    for (const existingAlert of roomAlerts) {
-                        await apiService.deleteAlert(existingAlert.alertId);
-                    }
-                }
+                await apiService.deleteAlertsByRoom(roomId);
             } catch {
                 
             }

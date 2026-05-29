@@ -91,5 +91,8 @@ export const apiService = {
     }),
     deleteAlert: (id) => fetchWithAuth(`/alertSvc/${id}`, {
         method: 'DELETE'
+    }),
+    deleteAlertsByRoom: (roomId) => fetchWithAuth(`/alertSvc/room/${roomId}`, {
+        method: 'DELETE'
     })
 };

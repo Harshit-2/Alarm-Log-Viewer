@@ -172,6 +172,37 @@ namespace AlarmLogViewerAPI.Controllers
             }
         }
 
+        [HttpDelete("Room/{roomId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> DeleteByRoom(string roomId)
+        {
+            try
+            {
+                try
+                {
+                    var roomAlerts = await alertRepo.GetByRoomIdAsync(roomId);
+                    foreach (var alert in roomAlerts)
+                    {
+                        await alertRepo.DeleteAsync(alert.AlertId);
+                    }
+                }
+                catch (AlertException)
+                {
+                }
+
+                await alertRepo.LogActivityAsync(
+                    "Room Deleted by Technician",
+                    $"RoomId={roomId} and its alerts were permanently deleted");
+
+                return Ok("Room alerts deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
 
         
