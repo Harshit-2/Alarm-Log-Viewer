@@ -24,7 +24,7 @@ const AdminDashboard = () => {
             const data = await apiService.getUsers();
             setUsers(data || []);
         } catch (err) {
-            setError('⚠️ User Service is unavailable: ' + err.message);
+            setError('User Service is unavailable: ' + err.message);
             setUsers([]);
         } finally {
             setLoading(false);

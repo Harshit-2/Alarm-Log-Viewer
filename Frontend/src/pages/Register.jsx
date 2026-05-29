@@ -145,7 +145,7 @@ const Register = () => {
                                     ></div>
                                 </div>
                                 <p className="password-rules-text" style={{ color: isPasswordValid ? '#38A169' : '#718096' }}>
-                                    {isPasswordValid ? '✅ Strong Password' : 'Requires: 6+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special symbol.'}
+                                    {isPasswordValid ? 'Strong Password' : 'Requires: 6+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special symbol.'}
                                 </p>
                             </div>
                         )}

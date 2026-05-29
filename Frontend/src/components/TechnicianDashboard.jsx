@@ -162,7 +162,7 @@ const TechnicianDashboard = ({ userId }) => {
                     status: status,
                     alertTime: new Date().toISOString()
                 });
-                alert(`⚠️ Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
+                alert(`Warning! Temperature is ${status}. An alert has been generated for supervisors.`);
             } else {
                 
                 try {
@@ -183,7 +183,7 @@ const TechnicianDashboard = ({ userId }) => {
                 } catch {
                     
                 }
-                alert('✅ Temperature recorded successfully. All systems normal.');
+                alert('Temperature recorded successfully. All systems normal.');
             }
 
             setShowTempModal(false);

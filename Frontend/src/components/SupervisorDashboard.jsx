@@ -169,7 +169,7 @@ const SupervisorDashboard = () => {
             fetchedRooms = await apiService.getRooms() || [];
             setRooms(fetchedRooms);
         } catch (err) {
-            newWarnings.push('⚠️ Room Service is unavailable: ' + err.message);
+            newWarnings.push('Room Service is unavailable: ' + err.message);
             setRooms([]);
         }
 
@@ -178,7 +178,7 @@ const SupervisorDashboard = () => {
             const alertsData = await apiService.getAlerts();
             setAlerts(alertsData || []);
         } catch (err) {
-            newWarnings.push('⚠️ Alert Service is unavailable: ' + err.message);
+            newWarnings.push('Alert Service is unavailable: ' + err.message);
             setAlerts([]);
         }
 
@@ -187,7 +187,7 @@ const SupervisorDashboard = () => {
             const usersData = await apiService.getUsers();
             setUsers(usersData || []);
         } catch (err) {
-            newWarnings.push('⚠️ User Service is unavailable: ' + err.message);
+            newWarnings.push('User Service is unavailable: ' + err.message);
             setUsers([]);
         }
 
@@ -196,7 +196,7 @@ const SupervisorDashboard = () => {
             const logsData = await apiService.getActivityLogs();
             setActivityLogs(logsData || []);
         } catch (err) {
-            newWarnings.push('⚠️ Alert Service (Logs) is unavailable: ' + err.message);
+            newWarnings.push('Alert Service (Logs) is unavailable: ' + err.message);
             setActivityLogs([]);
         }
 
@@ -234,7 +234,7 @@ const SupervisorDashboard = () => {
             
             
             if (failedCount === fetchedRooms.length) {
-                newWarnings.push('⚠️ Temperature Service is unavailable: ' + tempResults[0].reason?.message);
+                newWarnings.push('Temperature Service is unavailable: ' + tempResults[0].reason?.message);
             }
         }
 
