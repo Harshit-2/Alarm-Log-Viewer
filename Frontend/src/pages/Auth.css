@@ -272,15 +272,6 @@
 }
 
 
-.dashboard-nav h1::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 8px rgba(79, 70, 229, 0.4);
-  flex-shrink: 0;
-}
 
 
 .logout-btn {

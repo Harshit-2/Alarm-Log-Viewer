@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import alarmLogo from '../assets/alarm-logo.png';
 import './Landing.css';
 
 const Landing = () => {
@@ -47,7 +48,10 @@ const Landing = () => {
         <div className="landing-container" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
             {}
             <nav className="landing-nav">
-                <div className="logo">AlarmLog System</div>
+                <div className="logo">
+                    <img src={alarmLogo} alt="Alarm Logo" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
+                    AlarmLog System
+                </div>
                 {}
             </nav>
 

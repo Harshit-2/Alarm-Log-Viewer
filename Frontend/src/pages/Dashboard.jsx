@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import TechnicianDashboard from '../components/TechnicianDashboard';
 import SupervisorDashboard from '../components/SupervisorDashboard';
 import AdminDashboard from '../components/AdminDashboard';
+import alarmLogo from '../assets/alarm-logo.png';
 import './Auth.css';
 
 const Dashboard = () => {
@@ -14,7 +15,10 @@ const Dashboard = () => {
         <>
             <div className="dashboard-container">
                 <nav className="dashboard-nav glass-navbar">
-                    <h1>Alarm Log Viewer</h1>
+                    <h1>
+                        <img src={alarmLogo} alt="Alarm Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                        Alarm Log Viewer
+                    </h1>
                     <div className="nav-user-info">
                         <div className="nav-user-meta">
                             <span className="nav-user-name">{user?.username}</span>
