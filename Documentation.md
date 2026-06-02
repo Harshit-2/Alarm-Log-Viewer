@@ -433,7 +433,7 @@ This is called **Loose Coupling**. If we wanted to switch from SQL Server to Mon
 
 ---
 
-# 20. Configuration Files & Program.cs Deep Dive
+# 20. Configuration Files & Program.cs
 
 ### `Program.cs` (The Startup File)
 Every ASP.NET Core microservice starts in `Program.cs`. It has two main jobs:
